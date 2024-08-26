@@ -5,13 +5,13 @@ assessment_doc = Document('./ReferralFormFilled.docx')
 
 def extract_assessment_data(doc):
     data = {}
-    section_found = False
+    section_one = False
 
     for paragraph in doc.paragraphs:
         if "Section 1: Personal Information" in paragraph.text:
-            section_found = True
+            section_one = True
 
-        if section_found and "Name (First & Last)" in paragraph.text:
+        if section_one and "Name (First & Last)" in paragraph.text:
             data['name'] = paragraph.text.split(":")[1].strip()
         if "Title" in paragraph.text:
             data['title'] = paragraph.text.split(":")[1].strip()
@@ -48,4 +48,50 @@ def extract_assessment_data(doc):
     return data
 
 assessment_data = extract_assessment_data(assessment_doc)
-print(assessment_data)
+# print(assessment_data)
+
+def concatFirstLastName(data):
+    return data['name'].split(" ")[0] + " " + data['name'].split(" ")[1]
+
+	# Load the referral form template
+referral_doc = Document('OutputFormEmpty.docx')
+
+def fill_referral_form(referral_doc, data):
+    client_details = False
+
+    in_section = False
+    section_text = []
+
+    for paragraph in referral_doc.paragraphs:
+        if "Client Details" in paragraph.text:
+            in_section = True
+
+        if "Disability / Diagnosis Details" in paragraph.text:
+            in_section = False
+
+        if in_section:
+            section_text.append(paragraph.text.strip())
+            print(paragraph.text.strip())
+
+    # for paragraph in referral_doc.paragraphs:
+    #     for runs in paragraph.runs:
+    #         if runs.bold and "Last name" in runs.text:
+    #             runs.text += data['name'].split(" ")[1]
+        # if "Last name" in paragraph.text:
+        #     client_details = True
+        # if client_details and "Last name" in paragraph.text:
+        #     # Get Last name from paragraph.text
+        #     start_idx = paragraph.text.findFirst("Last name")
+        #     print(start_idx)
+        #     # append name to the paragraph
+            
+        #     # paragraph.text = paragraph.text[:start_idx] + " " + data['name'] + paragraph.text[start_idx:]
+            
+        #     client_details = False
+    
+    # Save the filled referral form
+    referral_doc.save('OutputFormEmptyTest.docx')
+
+# Fill out the referral form with the extracted data
+fill_referral_form(referral_doc, assessment_data)
+    
