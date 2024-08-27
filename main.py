@@ -1,5 +1,27 @@
 from docx import Document
+from docx.shared import Pt
 from datetime import datetime
+
+
+# config = {
+#     "sections": {
+#         "personal_info": "Section 1: Personal Information",
+#         "medical_info": "Section 2: Medical Information"
+#     },
+#     "labels": {
+#         "title": "Title (Mr/Mrs/Ms/etc.):",
+#     }
+# }
+
+# # Use the configuration dictionary in your function calls
+# client_details = {
+#     'Title:': extract_text(
+#         input_doc,
+#         config["labels"]["title"],
+#         config["sections"]["personal_info"],
+#         config["sections"]["medical_info"]
+#     ),
+# }
 
 # Load the input and output documents
 input_doc = Document('ReferralFormFilled.docx')
@@ -48,8 +70,6 @@ def fill_fields(output_doc, data, start_text=None, end_text=None):
                     for run in paragraph.runs:
                         if key in run.text:
                             print(f"Replacing '{key}' with '{value}'")
-                            # make value normal style font
-
                             run.text = run.text.replace(key, f"{key} {value}")
 
 def split_name(name):
@@ -63,30 +83,35 @@ def split_disabilities(disabilities):
 
 
 def insert_bullet_points(output_doc, data, start_text=None, end_text=None):
-    start_found = False if start_text else True  # If no start_text, start immediately
-    bullets = []
+    start_found = False if start_text else True
+
+    styles = output_doc.styles
+    print(styles)
+
+    for style in styles:
+        print(style.name)
     for paragraph in output_doc.paragraphs:
+
         if start_text and start_text in paragraph.text:
-            print("START")
             start_found = True
             continue
 
-
         if end_text and end_text in paragraph.text:
-            print("END")
             start_found = False
             continue 
 
         if start_found:
             for key, value in data.items():
-                bullets.append(value)
-                print(bullets)
                 if key in paragraph.text:
-                    print(f"Replacing '{key}' with '{value}'")
-                    # for run in paragraph.runs:
-                    #     if key in run.text:
-                    #         print(f"Replacing '{key}' with '{value}'")
-                    #         # run.text = run.text.replace(key, f"{key} {value}")
+                    paragraph.clear()
+                    items = value.split(', ')
+                    for item in items:
+                        new_run = paragraph.add_run(f"•  {item.strip()}")
+                        font = new_run.font
+                        font.name = 'Times New Roman'
+                        font.size = Pt(12)
+                        font.bold = True
+                        new_run.add_break()
 
 
 assessment_details = {
@@ -136,12 +161,15 @@ disability_diagnosis = {
 
 
 
+# Fill the output document with all required data
 fill_fields(output_doc, assessment_details, "Assessment Information", "Client Details")
 fill_fields(output_doc, client_details, "Client Details", "Disability / Diagnosis Details")
 fill_fields(output_doc, alt_contact, "Alternative Contact Details", "Emergency Contact Details")
-# fill_fields(output_doc, disability, "Disability / Diagnosis Details", "Other Information")
-# insert_bullet_points(output_doc, disability_diagnosis, "Disability / Diagnosis Details", "Reason for Assessment")
-# Save the updated output document
+insert_bullet_points(output_doc, disability_diagnosis, "Disability / Diagnosis Details", "Reason for Assessment / Referral to Taikura Trust")
+
+
+
+
 date_created = datetime.now().strftime("%d-%m-%Y")
 output_doc.save(f"{date_created}_OutputForm.docx")
 print("Data has been transferred and appended successfully.")
