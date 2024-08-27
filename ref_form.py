@@ -1,97 +1,59 @@
 from docx import Document
 
-# Load the assessment form
-assessment_doc = Document('./ReferralFormFilled.docx')
+# Load the input and output documents
+input_doc = Document('ReferralFormFilled.docx')
+output_doc = Document('OutputFormEmpty.docx')
 
-def extract_assessment_data(doc):
-    data = {}
-    section_one = False
+# Function to extract text from paragraphs based on a keyword
+def extract_text(doc, keyword):
+    for para in doc.paragraphs:
+        if keyword in para.text:
+            return para.text.split(keyword)[1].strip()
+    return ''  # Return an empty string if the keyword is not found
 
-    for paragraph in doc.paragraphs:
-        if "Section 1: Personal Information" in paragraph.text:
-            section_one = True
+def split_name(name):
+    name_parts = name.split(' ')
+    return name_parts[0], ' '.join(name_parts[1:])
 
-        if section_one and "Name (First & Last)" in paragraph.text:
-            data['name'] = paragraph.text.split(":")[1].strip()
-        if "Title" in paragraph.text:
-            data['title'] = paragraph.text.split(":")[1].strip()
-        if "Preferred Name" in paragraph.text:
-            data['preferred_name'] = paragraph.text.split(":")[1].strip()
-        if "Address" in paragraph.text:
-            data['address'] = paragraph.text.split(":")[1].strip()
-        if "Contact" in paragraph.text:
-            data['contact'] = paragraph.text.split(":")[1].strip()
-        if "Email" in paragraph.text:
-            data['email'] = paragraph.text.split(":")[1].strip()
-        if "Preferred Contact" in paragraph.text:
-            data['preferred_contact'] = paragraph.text.split(":")[1].strip()
-        if "Date of Birth" in paragraph.text:
-            data['dob'] = paragraph.text.split(":")[1].strip()
-        if "Gender" in paragraph.text:
-            data['gender'] = paragraph.text.split(":")[1].strip()
-        if "Pronoun" in paragraph.text:
-            data['pronoun'] = paragraph.text.split(":")[1].strip()
-        if "Residency Status" in paragraph.text:
-            data['residency_status'] = paragraph.text.split(":")[1].strip()
-        if "Ethnicity" in paragraph.text:
-            data['ethnicity'] = paragraph.text.split(":")[1].strip()
-        if "Iwi" in paragraph.text:
-            data['iwi'] = paragraph.text.split(":")[1].strip()
-        if "First Language" in paragraph.text:
-            data['first_language'] = paragraph.text.split(":")[1].strip()
-        if "Interpreter" in paragraph.text:
-            data['interpreter'] = paragraph.text.split(":")[1].strip()
-        if "Cultural Support" in paragraph.text:
-            data['cultural_support'] = paragraph.text.split(":")[1].strip()
-        if "Communication Needs" in paragraph.text:
-            data['communication_needs'] = paragraph.text.split(":")[1].strip()
-    return data
+def split_disabilities(disabilities):
+    return disabilities.split(',')
 
-assessment_data = extract_assessment_data(assessment_doc)
-# print(assessment_data)
+# Extract data from input document
+data = {
+    'Last name': split_name(extract_text(input_doc, "Name (First & Last):"))[1],
+    'First name': split_name(extract_text(input_doc, "Name (First & Last):"))[0],
+    'NHI number: ': extract_text(input_doc, "National Health Index (NHI) Number:"),
+    'Title': extract_text(input_doc, "Title (Mr/Mrs/Ms/etc.):"),
+    'Address': extract_text(input_doc, "Address:"),
+    'Mobile': extract_text(input_doc, "Contact Number:"),
+    'Email': extract_text(input_doc, "Email:"),
+    'Date of Birth': extract_text(input_doc, "Date of Birth:"),
+    'Gender': extract_text(input_doc, "Gender:"),
+    'Ethnicity': extract_text(input_doc, "Ethnicity:"),
+    'Iwi / Hapū (if Māori):' : extract_text(input_doc, "Iwi / Hapū (if Māori):"),
+    'First language': extract_text(input_doc, "First Language (if not English):"),
+    'Interpreter required': extract_text(input_doc, "Interpreter Required:"),
+    'Cultural support required': extract_text(input_doc, "Cultural Support Required:"),
+    "Communication needs": extract_text(input_doc, "Communication Needs:"),
+    "Preferred contact method": extract_text(input_doc, "Preferred Contact Method:"),
+    "Name of GP": extract_text(input_doc, "Doctor/GP Name:"),
+    "GP's phone number": extract_text(input_doc, "Medical Centre Contact Number:"),
+    "Primary disability": split_disabilities(extract_text(input_doc, "Disability Name/Type:"))[0],
+}
 
-def concatFirstLastName(data):
-    return data['name'].split(" ")[0] + " " + data['name'].split(" ")[1]
+print(data)
 
-	# Load the referral form template
-referral_doc = Document('OutputFormEmpty.docx')
+# Function to append data to placeholders in the output document
+# def append_data_to_placeholders(doc, replacements):
+#     for para in doc.paragraphs:
+#         for key, value in replacements.items():
+#             if key in para.text:
+#                 # Append the extracted value to the existing text
+#                 para.text += f' {value if value else ""}'
 
-def fill_referral_form(referral_doc, data):
-    client_details = False
+# # Append data to output document
+# append_data_to_placeholders(output_doc, data)
 
-    in_section = False
-    section_text = []
-
-    for paragraph in referral_doc.paragraphs:
-        if "Client Details" in paragraph.text:
-            in_section = True
-
-        if "Disability / Diagnosis Details" in paragraph.text:
-            in_section = False
-
-        if in_section:
-            section_text.append(paragraph.text.strip())
-            print(paragraph.text.strip())
-
-    # for paragraph in referral_doc.paragraphs:
-    #     for runs in paragraph.runs:
-    #         if runs.bold and "Last name" in runs.text:
-    #             runs.text += data['name'].split(" ")[1]
-        # if "Last name" in paragraph.text:
-        #     client_details = True
-        # if client_details and "Last name" in paragraph.text:
-        #     # Get Last name from paragraph.text
-        #     start_idx = paragraph.text.findFirst("Last name")
-        #     print(start_idx)
-        #     # append name to the paragraph
-            
-        #     # paragraph.text = paragraph.text[:start_idx] + " " + data['name'] + paragraph.text[start_idx:]
-            
-        #     client_details = False
-    
-    # Save the filled referral form
-    referral_doc.save('OutputFormEmptyTest.docx')
-
-# Fill out the referral form with the extracted data
-fill_referral_form(referral_doc, assessment_data)
-    
+# # Save the updated output document
+# output_doc.save('OutputFormFilled.docx')
+# print("Data has been appended successfully.")
