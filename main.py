@@ -1,31 +1,21 @@
 from docx import Document
 from docx.shared import Pt
 from datetime import datetime
+import os
 
-
-# config = {
-#     "sections": {
-#         "personal_info": "Section 1: Personal Information",
-#         "medical_info": "Section 2: Medical Information"
-#     },
-#     "labels": {
-#         "title": "Title (Mr/Mrs/Ms/etc.):",
-#     }
-# }
-
-# # Use the configuration dictionary in your function calls
-# client_details = {
-#     'Title:': extract_text(
-#         input_doc,
-#         config["labels"]["title"],
-#         config["sections"]["personal_info"],
-#         config["sections"]["medical_info"]
-#     ),
-# }
 
 # Load the input and output documents
-input_doc = Document('ReferralFormFilled.docx')
-output_doc = Document('OutputFormEmpty.docx')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+input_doc_path = os.path.join(current_dir, 'ReferralFormFilled.docx')
+output_doc_path = os.path.join(current_dir, 'OutputFormEmpty.docx')
+
+# Create the downloads directory if it doesn't exist
+output_dir = os.path.join(current_dir, 'downloads')
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+input_doc = Document(input_doc_path)
+output_doc = Document(output_doc_path)
 
 # Function to extract text from paragraphs based on a keyword
 def extract_text(doc, keyword, start_text=None, end_text=None):
@@ -123,7 +113,7 @@ assessment_details = {
 client_details = {
     'Last name:': split_name(extract_text(input_doc, "Name (First & Last):", "Section 1: Personal Information", "Section 2: Medical Information"))[1],
     'First name:': split_name(extract_text(input_doc, "Name (First & Last):", "Section 1: Personal Information", "Section 2: Medical Information"))[0],
-    'NHI number:' : extract_text(input_doc, "National Health Index (NHI) Number:", "Section 1: Personal Information", "Section 2: Medical Information"),
+    'NHI number:' : assessment_details['NHI:'],
     'Title:': extract_text(input_doc, "Title (Mr/Mrs/Ms/etc.):", "Section 1: Personal Information", "Section 2: Medical Information"),
     'Marital status:': extract_text(input_doc, "Marital Status:", "Section 1: Personal Information", "Section 2: Medical Information") or "Single",
     'Address:': extract_text(input_doc, "Address:", "Section 1: Personal Information", "Section 2: Medical Information"),
@@ -171,5 +161,27 @@ insert_bullet_points(output_doc, disability_diagnosis, "Disability / Diagnosis D
 
 
 date_created = datetime.now().strftime("%d-%m-%Y")
-output_doc.save(f"{date_created}_OutputForm.docx")
+output_doc.save(f"downloads/{date_created}-{client_details['First name:']}-{client_details['Last name:']}-OutputForm.docx")
 print("Data has been transferred and appended successfully.")
+
+
+
+
+# config = {
+#     "sections": {
+#         "personal_info": "Section 1: Personal Information",
+#         "medical_info": "Section 2: Medical Information"
+#     },
+#     "labels": {
+#         "title": "Title (Mr/Mrs/Ms/etc.):",
+#     }
+# }
+
+# client_details = {
+#     'Title:': extract_text(
+#         input_doc,
+#         config["labels"]["title"],
+#         config["sections"]["personal_info"],
+#         config["sections"]["medical_info"]
+#     ),
+# }
