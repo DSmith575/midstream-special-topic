@@ -49,7 +49,6 @@ def process_audio():
         print("File deleted")
 
 
-
     chunks = make_chunks(audio, chunk_length_ms)
 
     with Pool() as pool:
