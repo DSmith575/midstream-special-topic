@@ -6,6 +6,8 @@ from pydub.utils import make_chunks
 import noisereduce as nr
 from multiprocessing import Pool
 from docx import Document
+import torch
+import os
 
 def process_chunk(chunk):
     chunk_np = np.array(chunk.get_array_of_samples())
@@ -25,8 +27,28 @@ def process_chunk(chunk):
     return reduced_chunk_audio
 
 def process_audio():
-    chunk_length_ms = 300000
+    # chunk_length_ms = 300000
+    chunk_length_ms = 120000
     audio = AudioSegment.from_file("./Audio/Deacon.m4a")
+    # audio = AudioSegment.from_file("./Audio/switch.mp4")
+
+    trimmed_path = "./TrimmedAudio/Deacon_trimmed.wav"
+    if os.path.exists(trimmed_path):
+        os.remove(trimmed_path)
+        print("File deleted")
+
+    file_transcription = "./Transcription-original.docx"
+    if os.path.exists(file_transcription):
+        os.remove(file_transcription)
+        print("File deleted")
+
+    file_processed_transcription = "./Transcription-processed.docx"
+    
+    if os.path.exists(file_processed_transcription):
+        os.remove(file_processed_transcription)
+        print("File deleted")
+
+
 
     chunks = make_chunks(audio, chunk_length_ms)
 
@@ -37,7 +59,8 @@ def process_audio():
 
     combined_audio.export("./TrimmedAudio/Deacon_trimmed.wav", format="wav")
 
-    model = whisper.load_model("base")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = whisper.load_model("large", device=device)
 
     result = model.transcribe("./TrimmedAudio/Deacon_trimmed.wav", language="en", verbose=True)
     print("Transcription of processed audio:")
