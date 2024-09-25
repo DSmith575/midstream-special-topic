@@ -28,29 +28,28 @@ def process_chunk(chunk):
     return reduced_chunk_audio
 
 def process_audio(audio_path):
+
+    if not os.path.exists('processed'):
+        os.makedirs('processed')
+
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
+
     # chunk_length_ms = 300000
     chunk_length_ms = 120000
+    print("audio path", audio_path)
     audio = AudioSegment.from_file(audio_path)
-    filename = audio_path.split('/')[-1]
-    filename = filename.split('.')[0]
+    filename = audio_path.split('\\')[-1].split('.')[0]
+    print(f"Processing audio file {filename}")
 
-        processed_wav_path = os.path.join('processed', f"{filename}.wav")
-        original_docx_path = os.path.join('processed', f"{filename}-original.docx")
-        processed_docx_path = os.path.join('processed', f"{filename}-processed.docx")
+    processed_wav_path = os.path.join('processed', f"{filename}.wav")
+    original_docx_path = os.path.join('processed', f"{filename}-original.docx")
+    processed_docx_path = os.path.join('processed', f"{filename}-processed.docx")
 
         # Ensure files do not already exist
-        if os.path.exists(processed_wav_path):
-            os.remove(processed_wav_path)
-            logging.info(f"Removed existing file: {processed_wav_path}")
-
-        if os.path.exists(original_docx_path):
-            os.remove(original_docx_path)
-            logging.info(f"Removed existing file: {original_docx_path}")
-
-        if os.path.exists(processed_docx_path):
-            os.remove(processed_docx_path)
-            logging.info(f"Removed existing file: {processed_docx_path}")
-
+    for file_path in [processed_wav_path, original_docx_path, processed_docx_path]:
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     chunks = make_chunks(audio, chunk_length_ms)
 
@@ -58,8 +57,8 @@ def process_audio(audio_path):
         processed_chunks = pool.map(process_chunk, chunks)
 
     combined_audio = sum(processed_chunks)
-
-    combined_audio.export(f"./processed/{filename}.wav", format="wav")
+    print(f"Saving processed file to {processed_wav_path}")
+    combined_audio.export(processed_wav_path, format="wav")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = whisper.load_model("large", device=device)
@@ -80,6 +79,8 @@ def process_audio(audio_path):
     original_document.add_heading('Transcription of original audio:', level=1)
     original_document.add_paragraph(result_original["text"])
     original_document.save(f'./processed/{filename}-original.docx')
+
+    print('Finished Processing')
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

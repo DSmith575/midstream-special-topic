@@ -3,6 +3,7 @@ import os
 import subprocess
 
 app = Flask(__name__)
+
 app.config['UPLOAD_FOLDER'] = './uploads'
 app.config['PROCESSED_FOLDER'] = './processed'
 app.config['ALLOWED_EXTENSIONS'] = {'wav', 'mp3', 'm4a', 'mp4'}
@@ -27,7 +28,7 @@ def upload_file():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         split_filename = remove_filename_extension(file)
-        filename = split_filename + '.' + file.filename.rsplit('.', 1)[1].lower()
+        filename = split_filename + '.' + file.filename.rsplit('.', 1)[1].lower().replace(" ", "-")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
@@ -51,6 +52,7 @@ def upload_file():
             return "Processed file not found", 404
         
         return send_file(processed_document, as_attachment=True)
+    
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
