@@ -9,6 +9,15 @@ import noisereduce as nr
 import whisper
 from docx import Document
 import torch
+import time
+
+import logging
+import traceback
+
+
+logging.basicConfig(level=logging.ERROR, filename='error.log', filemode='a', 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 CHUNK_LENGTH_MS = 120000  # 2 minutes
 SILENCE_THRESHOLD = -30    # in dBFS
@@ -63,36 +72,60 @@ def save_transcription_to_docx(transcription, filename, original=False):
     document.save(os.path.join(PROCESSED_DIR, f"{filename}-original.docx" if original else f"{filename}-processed.docx"))
 
 def process_audio(audio_path):
-    # Main processing function to handle audio transcription.
-    create_directories()
-    
-    audio = AudioSegment.from_file(audio_path)
-    filename = os.path.splitext(os.path.basename(audio_path))[0]
-    clean_existing_files(filename)
+    try:
+        start_time = time.time()
+        print("Starting transcription...")
 
-    chunks = make_chunks(audio, CHUNK_LENGTH_MS)
-    
-    with Pool() as pool:
-        processed_chunks = pool.map(process_chunk, chunks)
+        create_directories()
 
-    combined_audio = sum(processed_chunks)
-    processed_wav_path = os.path.join(PROCESSED_DIR, f"{filename}.wav")
-    combined_audio.export(processed_wav_path, format="wav")
+        audio = AudioSegment.from_file(audio_path)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = whisper.load_model("large", device=device)
+        print(audio_path)
+        print(audio)
+        filename = os.path.splitext(os.path.basename(audio_path))[0]
+        print("filename", filename)
+        clean_existing_files(filename)
+        print("cleaned existing files", filename)
 
-    print("Transcribing processed audio...")
-    processed_result = transcribe_audio(processed_wav_path, model)
-    save_transcription_to_docx(processed_result, filename)
+        chunks = make_chunks(audio, CHUNK_LENGTH_MS)
+        print("chunks", chunks)
 
-    print("Transcribing original audio...")
-    original_result = transcribe_audio(audio_path, model)
-    save_transcription_to_docx(original_result, filename, original=True)
+        # Single-threaded processing for now
+        processed_chunks = [process_chunk(chunk) for chunk in chunks]
 
-    print('Finished Processing')
+        # Multi-threaded processing
+        # with Pool() as pool:
+        #     processed_chunks = pool.map(process_chunk, chunks)
+        #     print("processed_chunks", processed_chunks)
 
-    return processed_result
+        combined_audio = sum(processed_chunks)
+        
+        processed_wav_path = os.path.join(PROCESSED_DIR, f"{filename}.wav")
+        combined_audio.export(processed_wav_path, format="wav")
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = whisper.load_model("large", device=device)
+
+        print("Transcribing processed audio...")
+        processed_result = transcribe_audio(processed_wav_path, model)
+        save_transcription_to_docx(processed_result, filename)
+
+        print("Transcribing original audio...")
+        original_result = transcribe_audio(audio_path, model)
+        save_transcription_to_docx(original_result, filename, original=True)
+
+        print('Finished Processing')
+        print(f"Time taken: {time.time() - start_time} seconds")
+        return processed_result
+
+    except Exception as e:
+        # Log the complete traceback and error message
+        logging.error(f"An error occurred: {str(e)}")
+        logging.error(traceback.format_exc())
+        print(f"An error occurred: {str(e)}. Check 'error.log' for more details.")
+        raise  # Re-raise the exception for Flask or the caller to catch
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python audio_process.py <audio_path>")

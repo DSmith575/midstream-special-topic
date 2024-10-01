@@ -103,28 +103,47 @@
       </div>
     
 
-    <script>
+      <script>
         const form = document.getElementsByClassName('upload-audio')[0]; 
         const submitBtn = document.getElementsByClassName('submit-btn')[0];
         const overlay = document.getElementById('overlay');
-
+    
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             submitBtn.value = 'Uploading...';
-
+    
             overlay.style.display = 'block';
             overlay.setAttribute('aria-hidden', 'false');
             submitBtn.setAttribute('aria-busy', 'true');
-
+    
             const formData = new FormData(form);
-
+    
             try {
                 const response = await fetch(form.action, {
                     method: 'POST',
                     body: formData
                 });
-
-
+    
+                if (!response.ok) {
+                    // Handle non-200 responses
+                    const errorText = await response.text();
+                    alert(`Upload failed: ${response.status} ${errorText}`);
+                    return;
+                }
+    
+                const filename = await response.blob();
+                const url = window.URL.createObjectURL(filename);
+    
+                // Create a temporary link to download the processed file
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'processed_audio.wav'; // Change to the expected file name
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert('File processed and ready for download!');
+    
             } catch (error) {
                 alert('An error occurred while uploading the file.');
             } finally {
@@ -135,5 +154,6 @@
             }
         });
     </script>
+    
 </body>
 </html>
