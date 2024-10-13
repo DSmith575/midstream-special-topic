@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, send_file, jsonify
+import subprocess
 import os
 import sys
 from audio_processing import process_audio
@@ -26,6 +27,14 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
+def is_ffmpeg_installed():
+    try:
+        subprocess.run(['ffmpeg', '-version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return True
+    except FileNotFoundError:
+        return False
+
+
 def allowed_file(filename):
     if not filename:
         return False
@@ -35,6 +44,7 @@ def sanitize_filename(filename):
     name = os.path.splitext(filename)[0]
     name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)  # Replace non-alphanumeric with underscores
     return name
+
 
 @app.route('/')
 def index():
@@ -57,8 +67,6 @@ def upload_audio():
         logging.error("Invalid file uploaded")
         return redirect(request.url)
 
-    logging.info("File validation passed, proceeding to save.")
-    
     filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
@@ -70,14 +78,15 @@ def upload_audio():
         return "Failed to save file", 500
 
     try:
-        processed_document = process_audio(filepath)
+        processed_document, processed_result = process_audio(filepath)
         logging.info(f"Audio processed: {processed_document}")
     except Exception as e:
         logging.error(f"Audio processing failed: {e}")
         return "An error occurred during audio processing", 500
 
-    if not os.path.exists(processed_document):
-        logging.error("Processed file not found")
+    # Ensure processed_document is a string
+    if not isinstance(processed_document, str) or not os.path.exists(processed_document):
+        logging.error("Processed file not found or is not a valid path")
         return "Processed file not found", 404
 
     try:
@@ -85,6 +94,7 @@ def upload_audio():
     except Exception as e:
         logging.error(f"Error sending file: {e}")
         return "Error sending file", 500
+
 
 def run_flask_app():
     app.run(port=5000, debug=True, use_reloader=False)
