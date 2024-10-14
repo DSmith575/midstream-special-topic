@@ -74,6 +74,27 @@
           transform: rotate(360deg);
         }
       }
+
+      .pdf-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      iframe {
+        width: 80%;
+        height: 500px;
+        border: 1px solid #ccc;
+      }
+
+      .download-btn {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
     </style>
   </head>
 
@@ -100,11 +121,6 @@
       />
     </form>
 
-    <!-- <form class="upload-document" action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required class="upload-button">
-        <input class="submit-btn" type="submit" value="Upload" aria-busy="false">
-    </form> -->
-
     <div id="overlay" class="overlay" aria-hidden="true">
       <div class="container">
         <div
@@ -117,15 +133,23 @@
       </div>
     </div>
 
+    <div id="pdf-container" class="pdf-container" style="display: none;">
+      <iframe id="pdf-viewer"></iframe>
+      <br />
+      <a id="download-btn" class="download-btn" href="#" download="">Download PDF</a>
+    </div>
+
     <script>
       const form = document.getElementsByClassName("upload-audio")[0];
       const submitBtn = document.getElementsByClassName("submit-btn")[0];
       const overlay = document.getElementById("overlay");
+      const pdfContainer = document.getElementById("pdf-container");
+      const pdfViewer = document.getElementById("pdf-viewer");
+      const downloadBtn = document.getElementById("download-btn");
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         submitBtn.value = "Uploading...";
-
         overlay.style.display = "block";
         overlay.setAttribute("aria-hidden", "false");
         submitBtn.setAttribute("aria-busy", "true");
@@ -145,27 +169,27 @@
             return;
           }
 
-          const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = 'downloaded_file.docx'; // Fallback filename
-      if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
-        const matches = /filename="(.+)"/.exec(contentDisposition);
-        if (matches && matches[1]) {
-          filename = matches[1];
-        }
-      }
+          const contentDisposition = response.headers.get("Content-Disposition");
+          let filename;
+          if (contentDisposition && contentDisposition.indexOf("filename=") !== -1) {
+            const matches = /filename="(.+)"/.exec(contentDisposition);
+            if (matches && matches[1]) {
+              filename = matches[1];
+            }
+          }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
 
-      // Create a temporary link to download the processed file
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = filename; // Use the extracted filename
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      alert("File processed and ready for download!");
+          // Display the PDF in an iframe
+          pdfViewer.src = url;
+          pdfContainer.style.display = "block";
+
+          // Set the download button link and filename
+          downloadBtn.href = url;
+          downloadBtn.download = filename;
+
+          alert("File processed and ready for viewing and download!");
         } catch (error) {
           alert("An error occurred while uploading the file.");
         } finally {
