@@ -69,7 +69,10 @@ def save_transcription_to_docx(transcription, filename, original=False):
     title = 'Transcription of original audio:' if original else 'Transcription of processed audio:'
     document.add_heading(title, level=1)
     document.add_paragraph(transcription["text"])
-    document.save(os.path.join(PROCESSED_DIR, f"{filename}-original.docx" if original else f"{filename}-processed.docx"))
+    docx_filename = f"{filename}-original.docx" if original else f"{filename}-processed.docx"
+    document.save(os.path.join(PROCESSED_DIR, docx_filename))
+    
+    return os.path.join(PROCESSED_DIR, docx_filename)
 
 
 
@@ -104,18 +107,18 @@ def process_audio(audio_path):
         # Transcribe the processed audio
         print("Transcribing processed audio...")
         processed_result = transcribe_audio(processed_wav_path, model)
-        save_transcription_to_docx(processed_result, filename)
+        processed_document_path = save_transcription_to_docx(processed_result, filename)
 
         # Transcribe the original audio
-        print("Transcribing original audio...")
-        original_result = transcribe_audio(audio_path, model)
-        save_transcription_to_docx(original_result, filename, original=True)
+        # print("Transcribing original audio...")
+        # original_result = transcribe_audio(audio_path, model)
+        # save_transcription_to_docx(original_result, filename, original=True)
 
         print('Finished Processing')
         print(f"Time taken: {time.time() - start_time} seconds")
         
         # Return both the processed audio path and the transcription result
-        return processed_wav_path, processed_result
+        return processed_document_path
     except Exception as e:
         logging.error(f"An error occurred: {str(e)}")
         raise  # Re-raise the exception for the caller to handle

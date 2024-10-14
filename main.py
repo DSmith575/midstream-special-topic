@@ -78,7 +78,7 @@ def upload_audio():
         return "Failed to save file", 500
 
     try:
-        processed_document, processed_result = process_audio(filepath)
+        processed_document = process_audio(filepath)
         logging.info(f"Audio processed: {processed_document}")
     except Exception as e:
         logging.error(f"Audio processing failed: {e}")
@@ -90,7 +90,13 @@ def upload_audio():
         return "Processed file not found", 404
 
     try:
-        return send_file(processed_document, as_attachment=True, download_name=os.path.basename(processed_document))
+        response = send_file(
+        processed_document,
+        as_attachment=True,
+        download_name=os.path.basename(processed_document),
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
+        return response
     except Exception as e:
         logging.error(f"Error sending file: {e}")
         return "Error sending file", 500

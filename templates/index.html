@@ -148,18 +148,27 @@
             return;
           }
 
-          const filename = await response.blob();
-          const url = window.URL.createObjectURL(filename);
+          const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'downloaded_file.docx'; // Fallback filename
+      if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+        const matches = /filename="(.+)"/.exec(contentDisposition);
+        if (matches && matches[1]) {
+          filename = matches[1];
+        }
+      }
 
-          // Create a temporary link to download the processed file
-          const a = document.createElement("a");
-          a.style.display = "none";
-          a.href = url;
-          a.download = "processed_audio.wav"; // Change to the expected file name
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          alert("File processed and ready for download!");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link to download the processed file
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename; // Use the extracted filename
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      alert("File processed and ready for download!");
         } catch (error) {
           alert("An error occurred while uploading the file.");
         } finally {
