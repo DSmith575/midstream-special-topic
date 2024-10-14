@@ -80,14 +80,11 @@
   <body>
     <h1>Upload Audio File</h1>
 
-    {% if ffmpeg_installed %}
-    <p>FFmpeg is installed and ready to use!</p>
-    {% else %}
     <p style="color: red">
-      FFmpeg is not installed. Please install it from
+      Ensure FFmpeg is installed. Please install it from
       <a href="https://ffmpeg.org/download.html">here</a>.
     </p>
-    {% endif %}
+
     <form
       class="upload-audio"
       action="/upload-audio"
