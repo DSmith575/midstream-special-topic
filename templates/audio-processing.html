@@ -155,13 +155,13 @@
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
+
         submitBtn.value = "Uploading...";
         overlay.style.display = "block";
         overlay.setAttribute("aria-hidden", "false");
         submitBtn.setAttribute("aria-busy", "true");
 
         const formData = new FormData(form);
-        console.log(form)
 
         try {
           const response = await fetch(form.action, {

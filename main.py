@@ -3,16 +3,14 @@ import subprocess
 import os
 import sys
 from audio_processing import process_audio
-from assessment_form import extract_text_from_pdf, analyze_pdf_for_form
-import logging
+from assessment_form import process_data
 import re
-import traceback
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-
-# Configure logging to track errors
-# logging.basicConfig(level=logging.ERROR, filename='flask_errors.log', filemode='a',
-#                     format='%(asctime)s - %(levelname)s - %(message)s')
+app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 
 # Base directories for file uploads and processing
 BASE_DIR = os.path.dirname(os.path.abspath(sys.executable)) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
@@ -128,61 +126,52 @@ def upload_audio():
     
 @app.route('/upload-pdf', methods=['POST'])
 def upload_pdf():
-    # logging.info("Handling POST request at /upload-pdf")
     
     if 'file' not in request.files:
-        # logging.error("No file part in the request.")
         return redirect(request.url)
 
     file = request.files['file']
     
     print("OG FILE", file)
     if file.filename == '':
-        # logging.error("No file selected.")
         return redirect(request.url)
 
     if not allowed_file(file.filename):
-        # logging.error("Invalid file extension. Only PDFs are allowed.")
         return redirect(request.url)
     
-    # logging.error("File is a PDF")
 
     filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
     print("SANITIZED FILENAME", filename)
-    # logging.error(f"Sanitized filename: {filename}")
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     print("FILEPATH", filepath)
-    # logging.error(f"Filepath: {filepath}")
 
     try:
         file.save(filepath)
-        # logging.info(f"PDF file saved to {filepath}")
+        print("FILE SAVED", filepath)
     except Exception as e:
-        # logging.error(f"Failed to save PDF file: {e}")
         return "Failed to save PDF file", 500
 
     try:
-        extracted_text = extract_text_from_pdf(filepath)
-        # logging.info(f"PDF text extracted: {extracted_text}")
-        form_data = analyze_pdf_for_form(extracted_text)
-        # logging.info(f"PDF processed: {form_data}")
-    except Exception as e:
-        # logging.error(f"PDF processing failed: {e}")
-        return "An error occurred during PDF processing", 500
+        processed_document = process_data(filepath)
 
-    output_filename = 'processed_data.txt'
-    output_filepath = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
+    except Exception as e:
+        return "An error occured during processing", 500
+    
+    if not isinstance(processed_document, str) or not os.path.exists(processed_document):
+        # logging.error("Processed file not found or invalid.")
+        return "Processed file not found", 404
 
     try:
-        with open(output_filepath, 'w') as f:
-            f.write(form_data)
-        # logging.info(f"Processed data saved to {output_filepath}")
+        response = send_file(
+            processed_document,
+            as_attachment=True,
+            download_name=os.path.basename(processed_document),
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
+        return response
     except Exception as e:
-        # logging.error(f"Failed to write processed data: {e}")
-        return "Failed to write processed data", 500
-
-    return send_file(output_filepath, as_attachment=True)
-
+        # logging.error(f"Error sending file: {e}")
+        return "Error sending file", 500
 
 
 def run_flask_app():

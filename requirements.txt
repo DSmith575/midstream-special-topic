@@ -20,6 +20,7 @@ distro==1.9.0
 docx==0.2.4
 docx2pdf==0.1.8
 etelemetry==0.3.1
+exceptiongroup==1.2.2
 filelock==3.16.0
 fitz==0.0.1.dev2
 Flask==3.0.3
@@ -30,6 +31,7 @@ httpcore==1.0.6
 httplib2==0.22.0
 httpx==0.27.2
 idna==3.8
+importlib_resources==6.4.5
 isodate==0.6.1
 itsdangerous==2.2.0
 Jinja2==3.1.4
@@ -74,6 +76,7 @@ PyMuPDF==1.24.11
 pyparsing==3.1.4
 python-dateutil==2.9.0.post0
 python-docx==1.1.2
+python-dotenv==1.0.1
 pythonnet==3.0.4
 pytz==2024.2
 pywebview==5.2
@@ -86,7 +89,6 @@ requests==2.32.3
 scikit-learn==1.5.1
 scipy==1.14.1
 semantic-version==2.10.0
-setuptools==74.1.2
 setuptools-rust==1.10.1
 simplejson==3.19.3
 six==1.16.0

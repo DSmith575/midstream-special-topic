@@ -61,6 +61,9 @@ def save_transcription(transcription, filename, processed=True):
     """Save transcription as a DOCX file."""
     docx_filename = f"{filename}-{'processed' if processed else 'original'}.docx"
     docx_path = os.path.join(PROCESSED_DIR, docx_filename)
+    
+    # Ensure directory exists
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
 
     doc = Document()
     doc.add_heading(f"Transcription: {filename}", level=1)
@@ -70,6 +73,10 @@ def save_transcription(transcription, filename, processed=True):
 
 def convert_to_pdf(docx_path):
     """Convert DOCX to PDF."""
+    if not os.path.isfile(docx_path):
+        logging.error(f"{docx_path} does not exist.")
+        raise FileNotFoundError(f"{docx_path} does not exist.")
+
     try:
         pythoncom.CoInitialize()
         pdf_path = docx_path.replace(".docx", ".pdf")

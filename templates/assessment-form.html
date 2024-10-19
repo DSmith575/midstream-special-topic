@@ -75,6 +75,27 @@
         }
       }
 
+      .pdf-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      iframe {
+        width: 80%;
+        height: 500px;
+        border: 1px solid #ccc;
+      }
+
+      .download-btn {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
       .confirmation {
         margin-top: 20px;
         text-align: center;
@@ -113,7 +134,7 @@
           role="status"
           aria-live="polite"
         ></div>
-        <p>Submitting data...</p>
+        <p>Processing PDF...</p>
       </div>
     </div>
 
@@ -121,11 +142,22 @@
       <p>Assessment submitted successfully!</p>
     </div>
 
+    <div id="pdf-container" class="pdf-container" style="display: none">
+      <iframe id="pdf-viewer"></iframe>
+      <br />
+      <a id="download-btn" class="download-btn" href="#" download=""
+        >Download PDF</a
+      >
+    </div>
+
     <script>
       const form = document.getElementById("upload-pdf");
       const submitBtn = document.getElementsByClassName("submit-btn")[0];
       const overlay = document.getElementById("overlay");
       const confirmation = document.getElementById("confirmation");
+      const pdfContainer = document.getElementById("pdf-container");
+      const pdfViewer = document.getElementById("pdf-viewer");
+      const downloadBtn = document.getElementById("download-btn");
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault(); // Prevent default form submission
@@ -149,13 +181,40 @@
             return;
           }
 
+          const contentDisposition = response.headers.get(
+            "Content-Disposition"
+          );
+          let filename;
+          if (
+            contentDisposition &&
+            contentDisposition.indexOf("filename=") !== -1
+          ) {
+            const matches = /filename="(.+)"/.exec(contentDisposition);
+            if (matches && matches[1]) {
+              filename = matches[1];
+            }
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+
           // Show confirmation message
           confirmation.style.display = "block";
+
+          pdfViewer.src = url;
+          pdfContainer.style.display = "block";
+
+          // Set the download button link and filename
+          downloadBtn.href = url;
+          downloadBtn.download = filename;
+
+          alert("File processed and ready for viewing and download!");
           form.reset();
         } catch (error) {
           alert("An error occurred while submitting the form.");
         } finally {
           overlay.style.display = "none";
+          submitBtn.classList.remove("disabled-button");
           submitBtn.value = "Upload";
           submitBtn.setAttribute("aria-busy", "false");
         }
