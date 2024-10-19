@@ -96,9 +96,9 @@ soxr==0.5.0.post1
 sympy==1.13.1
 threadpoolctl==3.5.0
 tiktoken==0.7.0
-torch==2.5.0;platform_system == "Linux"
-torchaudio==2.5.0;platform_system == "Linux"
-torchvision==0.20.0;platform_system == "Linux"
+torch==2.5.0
+torchaudio==2.5.0
+torchvision==0.20.0
 # torch==2.5.0+cu118
 # torchaudio==2.5.0+cu118
 # torchvision==0.20.0+cu118
