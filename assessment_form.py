@@ -1,5 +1,5 @@
 from openai import OpenAI
-import fitz
+import pymupdf
 import os
 import time
 from docx2pdf import convert
@@ -59,7 +59,16 @@ def extract_text_from_pdf(filepath):
 
     try:
         # Open the PDF file
-        with fitz.open(filepath) as doc:  # Using a context manager
+        # open with pymu
+        with pymupdf.open(filepath) as doc:
+            text = ""
+            # Extract text from each page
+            for page in doc:
+                text += page.get_text("text")
+            
+            return text
+
+        with pymupdf.open(filepath) as doc:  # Using a context manager
             text = ""
             # Extract text from each page
             for page in doc:
