@@ -177,7 +177,7 @@ def upload_pdf():
 def run_flask_app():
     """Run the Flask app."""
     # app.run(port=5000, debug=True, use_reloader=False)
-    app.run()
+    app.run(port=5000)
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
