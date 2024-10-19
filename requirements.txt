@@ -26,6 +26,7 @@ fitz==0.0.1.dev2
 Flask==3.0.3
 fonttools==4.53.1
 fsspec==2024.9.0
+gunicorn==23.0.0
 h11==0.14.0
 httpcore==1.0.6
 httplib2==0.22.0
@@ -80,6 +81,8 @@ python-dotenv==1.0.1
 pythonnet==3.0.4
 pytz==2024.2
 pywebview==5.2
+pywin32==308
+pywin32-ctypes==0.2.3
 pyxnat==1.6.2
 rdflib==6.3.2
 regex==2024.7.24
@@ -99,9 +102,6 @@ tiktoken==0.7.0
 torch==2.5.0
 torchaudio==2.5.0
 torchvision==0.20.0
-# torch==2.5.0+cu118
-# torchaudio==2.5.0+cu118
-# torchvision==0.20.0+cu118
 tqdm==4.66.5
 traits==6.3.2
 typing_extensions==4.12.2
