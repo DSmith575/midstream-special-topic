@@ -98,9 +98,12 @@ soxr==0.5.0.post1
 sympy==1.13.1
 threadpoolctl==3.5.0
 tiktoken==0.7.0
-torch==2.5.0+cu118
-torchaudio==2.5.0+cu118
-torchvision==0.20.0+cu118
+torch==2.5.0
+torchaudio==2.5.0
+torchvision==0.20.0
+# torch==2.5.0+cu118
+# torchaudio==2.5.0+cu118
+# torchvision==0.20.0+cu118
 tqdm==4.66.5
 traits==6.3.2
 typing_extensions==4.12.2
