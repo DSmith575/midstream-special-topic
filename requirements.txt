@@ -56,7 +56,7 @@ noisereduce==3.0.2
 numba==0.60.0
 numpy==2.0.2
 openai==1.52.0
-openai-whisper==20231117
+openai-whisper
 packaging==24.1
 pandas==2.2.3
 pathlib==1.0.1
