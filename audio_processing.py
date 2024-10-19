@@ -10,7 +10,6 @@ from docx import Document
 import torch
 import time
 import logging
-import pythoncom
 from docx2pdf import convert
 
 
@@ -74,19 +73,17 @@ def save_transcription(transcription, filename, processed=True):
 def convert_to_pdf(docx_path):
     """Convert DOCX to PDF."""
     if not os.path.isfile(docx_path):
-        logging.error(f"{docx_path} does not exist.")
+        print(f"{docx_path} does not exist.")
         raise FileNotFoundError(f"{docx_path} does not exist.")
 
+def convert_docx_to_pdf(docx_path):
     try:
-        pythoncom.CoInitialize()
         pdf_path = docx_path.replace(".docx", ".pdf")
-        convert(docx_path, pdf_path)
+        convert(docx_path, pdf_path)  # Converts the DOCX file to PDF
         return pdf_path
     except Exception as e:
-        logging.error(f"Error converting {docx_path} to PDF: {str(e)}")
+        print(f"Error converting {docx_path} to PDF: {str(e)}")
         raise
-    finally:
-        pythoncom.CoUninitialize()
 
 def process_audio(audio_path):
     """Main processing function: chunk audio, process, transcribe, and convert."""
