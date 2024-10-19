@@ -99,9 +99,9 @@ tiktoken==0.7.0
 # torch==2.5.0
 # torchaudio==2.5.0
 # torchvision==0.20.0
-torch==2.5.0+cu118
-torchaudio==2.5.0+cu118
-torchvision==0.20.0+cu118
+torch==2.5.0+cu118; platform_system == "Linux"
+torchaudio==2.5.0+cu118; platform_system == "Linux"
+torchvision==0.20.0+cu118; platform_system == "Linux"
 tqdm==4.66.5
 traits==6.3.2
 typing_extensions==4.12.2
