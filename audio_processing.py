@@ -1,79 +1,128 @@
-import whisper
+import os
+import sys
 import numpy as np
 from pydub import AudioSegment
 from pydub.silence import detect_silence
 from pydub.utils import make_chunks
 import noisereduce as nr
-from multiprocessing import Pool
+import whisper
 from docx import Document
 import torch
-import os
+import time
+import logging
+import pythoncom
+from docx2pdf import convert
+
+
+
+logging.basicConfig(level=logging.ERROR, filename='error.log', filemode='a', 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+CHUNK_LENGTH_MS = 120000  # 2 minutes
+SILENCE_THRESHOLD = -30    # in dBFS
+MIN_SILENCE_LEN = 1000     # in milliseconds
+PROCESSED_DIR = 'processed'
+UPLOADS_DIR = 'uploads'
+
+# --- Utility Functions ---
+def create_directories():
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
+    os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+def clean_existing_files(filename):
+    """Remove existing processed files."""
+    for filename in os.listdir(PROCESSED_DIR):
+            file_path = os.path.join(PROCESSED_DIR, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    logging.info(f"Removed file: {file_path}")
+            except Exception as e:
+                logging.error(f"Failed to remove {file_path}: {e}")
 
 def process_chunk(chunk):
-    chunk_np = np.array(chunk.get_array_of_samples())
-    reduced_chunk = nr.reduce_noise(y=chunk_np, sr=chunk.frame_rate, prop_decrease=0.8)
+    """Reduce noise and trim silence from an audio chunk."""
+    reduced_chunk = nr.reduce_noise(y=np.array(chunk.get_array_of_samples()), 
+                                    sr=chunk.frame_rate, prop_decrease=0.8)
+    audio = AudioSegment(reduced_chunk.tobytes(), frame_rate=chunk.frame_rate, 
+                         sample_width=chunk.sample_width, channels=chunk.channels)
 
-    reduced_chunk_audio = AudioSegment(
-        reduced_chunk.tobytes(), 
-        frame_rate=chunk.frame_rate, 
-        sample_width=chunk.sample_width, 
-        channels=chunk.channels
-    )
+    # Trim silence
+    silences = detect_silence(audio, min_silence_len=MIN_SILENCE_LEN, 
+                              silence_thresh=SILENCE_THRESHOLD)
+    return audio[silences[0][0]:silences[-1][1]] if silences else audio
 
-    silences = detect_silence(reduced_chunk_audio, min_silence_len=1000, silence_thresh=-30)
-    if silences:
-        start_trim, end_trim = silences[0][0], silences[-1][1]
-        return reduced_chunk_audio[start_trim:end_trim]
-    return reduced_chunk_audio
+def transcribe_audio(model, audio_path):
+    """Use Whisper model to transcribe audio."""
+    return model.transcribe(audio_path, language="en", verbose=True)
 
-def process_audio():
-    # chunk_length_ms = 300000
-    chunk_length_ms = 120000
-    audio = AudioSegment.from_file("./Audio/Deacon.m4a")
-    # audio = AudioSegment.from_file("./Audio/switch.mp4")
-
-    trimmed_path = "./TrimmedAudio/Deacon_trimmed.wav"
-    if os.path.exists(trimmed_path):
-        os.remove(trimmed_path)
-        print("File deleted")
-
-    file_transcription = "./Transcription-original.docx"
-    if os.path.exists(file_transcription):
-        os.remove(file_transcription)
-        print("File deleted")
-
-    file_processed_transcription = "./Transcription-processed.docx"
+def save_transcription(transcription, filename, processed=True):
+    """Save transcription as a DOCX file."""
+    docx_filename = f"{filename}-{'processed' if processed else 'original'}.docx"
+    docx_path = os.path.join(PROCESSED_DIR, docx_filename)
     
-    if os.path.exists(file_processed_transcription):
-        os.remove(file_processed_transcription)
-        print("File deleted")
+    # Ensure directory exists
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
 
+    doc = Document()
+    doc.add_heading(f"Transcription: {filename}", level=1)
+    doc.add_paragraph(transcription["text"])
+    doc.save(docx_path)
+    return docx_path
 
-    chunks = make_chunks(audio, chunk_length_ms)
+def convert_to_pdf(docx_path):
+    """Convert DOCX to PDF."""
+    if not os.path.isfile(docx_path):
+        logging.error(f"{docx_path} does not exist.")
+        raise FileNotFoundError(f"{docx_path} does not exist.")
 
-    with Pool() as pool:
-        processed_chunks = pool.map(process_chunk, chunks)
+    try:
+        pythoncom.CoInitialize()
+        pdf_path = docx_path.replace(".docx", ".pdf")
+        convert(docx_path, pdf_path)
+        return pdf_path
+    except Exception as e:
+        logging.error(f"Error converting {docx_path} to PDF: {str(e)}")
+        raise
+    finally:
+        pythoncom.CoUninitialize()
 
-    combined_audio = sum(processed_chunks)
+def process_audio(audio_path):
+    """Main processing function: chunk audio, process, transcribe, and convert."""
+    try:
+        start_time = time.time()
+        create_directories()
 
-    combined_audio.export("./TrimmedAudio/Deacon_trimmed.wav", format="wav")
+        # Load audio and clean previous files
+        audio = AudioSegment.from_file(audio_path)
+        filename = os.path.splitext(os.path.basename(audio_path))[0]
+        clean_existing_files(filename)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = whisper.load_model("large", device=device)
+        # Process and combine chunks
+        processed_audio = sum([process_chunk(chunk) for chunk in make_chunks(audio, CHUNK_LENGTH_MS)])
+        processed_wav_path = os.path.join(PROCESSED_DIR, f"{filename}.wav")
+        processed_audio.export(processed_wav_path, format="wav")
 
-    result = model.transcribe("./TrimmedAudio/Deacon_trimmed.wav", language="en", verbose=True)
-    print("Transcription of processed audio:")
+        # Load Whisper model and transcribe
+        model = whisper.load_model("large", device="cuda" if torch.cuda.is_available() else "cpu")
+        transcription = transcribe_audio(model, processed_wav_path)
 
-    document = Document()
-    document.add_heading('Transcription of processed audio:', level=1)
-    document.add_paragraph(result["text"])
-    document.save('Transcription-processed.docx')
+        # Save transcription and convert to PDF
+        docx_path = save_transcription(transcription, filename)
+        pdf_path = convert_to_pdf(docx_path)
 
-    result_original = model.transcribe("./Audio/Deacon.m4a", language="en", verbose=False)
-    original_document = Document()
-    original_document.add_heading('Transcription of original audio:', level=1)
-    original_document.add_paragraph(result_original["text"])
-    original_document.save('Transcription-original.docx')
+        print(f"Processed transcription saved as PDF: {pdf_path}")
+        print(f"Processing time: {time.time() - start_time:.2f} seconds")
 
+        return pdf_path
+    except Exception as e:
+        logging.error(f"Error processing audio: {str(e)}")
+        raise
+
+# --- Entry Point ---
 if __name__ == '__main__':
-    process_audio()
+    if len(sys.argv) != 2:
+        print("Usage: python audio_process.py <audio_path>")
+        sys.exit(1)
+    process_audio(sys.argv[1])

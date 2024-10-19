@@ -1,175 +1,190 @@
-from docx import Document
-from docx.shared import Pt
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, send_file, jsonify
+import subprocess
+import os
+import sys
+from audio_processing import process_audio
+from assessment_form import process_data
+import re
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+
+# Base directories for file uploads and processing
+BASE_DIR = os.path.dirname(os.path.abspath(sys.executable)) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+PROCESSED_FOLDER = os.path.join(BASE_DIR, 'processed')
+ALLOWED_EXTENSIONS = {'wav', 'mp3', 'm4a', 'mp4', 'pdf'}
+
+# Flask app configuration
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+# app.config['ALLOWED_TEXT_EXTENSIONS'] = ALLOWED_TEXT_EXTENSIONS
+
+# Utility functions
+def is_ffmpeg_installed():
+    """Check if FFmpeg is installed."""
+    try:
+        subprocess.run(['ffmpeg', '-version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return True
+    except FileNotFoundError:
+        return False
+
+def allowed_file(filename):
+    """Check if the file is allowed based on the extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
-# config = {
-#     "sections": {
-#         "personal_info": "Section 1: Personal Information",
-#         "medical_info": "Section 2: Medical Information"
-#     },
-#     "labels": {
-#         "title": "Title (Mr/Mrs/Ms/etc.):",
-#     }
-# }
+def sanitize_filename(filename):
+    """Sanitize the filename by removing or replacing invalid characters."""
+    name = os.path.splitext(filename)[0]
+    return re.sub(r'[^a-zA-Z0-9_\-]', '-', name)
 
-# # Use the configuration dictionary in your function calls
-# client_details = {
-#     'Title:': extract_text(
-#         input_doc,
-#         config["labels"]["title"],
-#         config["sections"]["personal_info"],
-#         config["sections"]["medical_info"]
-#     ),
-# }
+def handle_exception(e):
+    """Log and return an error message as JSON."""
+    # logging.error(f"An error occurred: {str(e)}")
+    # logging.error(traceback.format_exc())
+    return jsonify({"error": str(e)}), 500
 
-# Load the input and output documents
-input_doc = Document('ReferralFormFilled.docx')
-output_doc = Document('OutputFormEmpty.docx')
+# Routes
+@app.route('/')
+def index():
+    """Render the main index page."""
+    return render_template('index.html')
 
-# Function to extract text from paragraphs based on a keyword
-def extract_text(doc, keyword, start_text=None, end_text=None):
-    start_found = False if start_text else True
-    for para in doc.paragraphs:
-        # Check for starting text point
-        if start_text and start_text in para.text:
-            start_found = True
-            continue
+@app.route('/referral-form')
+def referral_form():
+    """Render the referral form page."""
+    return render_template('referral-form.html')
 
-        # Check for ending text point
-        if end_text and end_text in para.text:
-            start_found = False
-            continue
+@app.route('/audio-processing')
+def audio_processing():
+    """Render the audio processing page."""
+    return render_template('audio-processing.html')
 
-        # If within the desired range, extracts data
-        if start_found and keyword in para.text:
-            return para.text.split(keyword)[1].strip()
-  
+@app.route('/assessment-form')
+def assessment_form():
+    """Render the audio processing page."""
+    return render_template('assessment-form.html')
 
-def fill_fields(output_doc, data, start_text=None, end_text=None):
-    start_found = False if start_text else True
-    for paragraph in output_doc.paragraphs:
+@app.route('/upload-audio', methods=['POST'])
+def upload_audio():
+    """Handle audio file upload and processing."""
+    if 'file' not in request.files:
+        # logging.error("No file part in the request.")
+        return redirect(request.url)
 
-        if start_text and start_text in paragraph.text:
-            print("found start text")
-            start_found = True
-            continue
+    file = request.files['file']
+    if file.filename == '':
+        # logging.error("No file selected.")
+        return redirect(request.url)
 
-        # Check for end marker
-        if end_text and end_text in paragraph.text:
-            print("end Text")
-            start_found = False
-            continue
+    if not allowed_file(file.filename):
+        # logging.error("Invalid file extension.")
+        return redirect(request.url)
 
-        # If within range, starts replacing text
-        if start_found:
-            print('here')
-            for key, value in data.items():
-                if key in paragraph.text:
-                    print(f"Replacing '{key}' with '{value}'")
-                    for run in paragraph.runs:
-                        if key in run.text:
-                            print(f"Replacing '{key}' with '{value}'")
-                            run.text = run.text.replace(key, f"{key} {value}")
+    filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    # logging.info(f"File uploaded: {filename}")
 
-def split_name(name):
-    name_parts = name.split(' ')
-    return name_parts[0], ' '.join(name_parts[1:])
+    # Save uploaded file
+    try:
+        file.save(filepath)
+        # logging.info(f"File saved to {filepath}")
+    except Exception as e:
+        # logging.error(f"Failed to save file: {e}")
+        return "Failed to save file", 500
 
-def split_disabilities(disabilities):
-    return disabilities.split(',')
+    # Process the audio file
+    try:
+        processed_document = process_audio(filepath)
+        # logging.info(f"Audio processed: {processed_document}")
+    except Exception as e:
+        # logging.error(f"Audio processing failed: {e}")
+        return "An error occurred during audio processing", 500
 
+    # Check if processed document is valid and exists
+    if not isinstance(processed_document, str) or not os.path.exists(processed_document):
+        # logging.error("Processed file not found or invalid.")
+        return "Processed file not found", 404
 
+    # Send processed file for download
+    try:
+        response = send_file(
+            processed_document,
+            as_attachment=True,
+            download_name=os.path.basename(processed_document),
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
+        return response
+    except Exception as e:
+        # logging.error(f"Error sending file: {e}")
+        return "Error sending file", 500
+    
+@app.route('/upload-pdf', methods=['POST'])
+def upload_pdf():
+    
+    if 'file' not in request.files:
+        return redirect(request.url)
 
+    file = request.files['file']
+    
+    print("OG FILE", file)
+    if file.filename == '':
+        return redirect(request.url)
 
-def insert_bullet_points(output_doc, data, start_text=None, end_text=None):
-    start_found = False if start_text else True
+    if not allowed_file(file.filename):
+        return redirect(request.url)
+    
 
-    styles = output_doc.styles
-    print(styles)
+    filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
+    print("SANITIZED FILENAME", filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    print("FILEPATH", filepath)
 
-    for style in styles:
-        print(style.name)
-    for paragraph in output_doc.paragraphs:
+    try:
+        file.save(filepath)
+        print("FILE SAVED", filepath)
+    except Exception as e:
+        return "Failed to save PDF file", 500
 
-        if start_text and start_text in paragraph.text:
-            start_found = True
-            continue
+    try:
+        processed_document = process_data(filepath)
 
-        if end_text and end_text in paragraph.text:
-            start_found = False
-            continue 
+    except Exception as e:
+        return "An error occured during processing", 500
+    
+    if not isinstance(processed_document, str) or not os.path.exists(processed_document):
+        # logging.error("Processed file not found or invalid.")
+        return "Processed file not found", 404
 
-        if start_found:
-            for key, value in data.items():
-                if key in paragraph.text:
-                    paragraph.clear()
-                    items = value.split(', ')
-                    for item in items:
-                        new_run = paragraph.add_run(f"•  {item.strip()}")
-                        font = new_run.font
-                        font.name = 'Times New Roman'
-                        font.size = Pt(12)
-                        font.bold = True
-                        new_run.add_break()
-
-
-assessment_details = {
-    'The assessment was completed on:': datetime.now().strftime("%d/%m/%Y"),
-    'Name:': extract_text(input_doc, "Name (First & Last):"),
-    'NHI:': extract_text(input_doc, "National Health Index (NHI) Number:"),
-}
-
-client_details = {
-    'Last name:': split_name(extract_text(input_doc, "Name (First & Last):", "Section 1: Personal Information", "Section 2: Medical Information"))[1],
-    'First name:': split_name(extract_text(input_doc, "Name (First & Last):", "Section 1: Personal Information", "Section 2: Medical Information"))[0],
-    'NHI number:' : extract_text(input_doc, "National Health Index (NHI) Number:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Title:': extract_text(input_doc, "Title (Mr/Mrs/Ms/etc.):", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Marital status:': extract_text(input_doc, "Marital Status:", "Section 1: Personal Information", "Section 2: Medical Information") or "Single",
-    'Address:': extract_text(input_doc, "Address:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Mobile:': extract_text(input_doc, "Contact Number:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Email:': extract_text(input_doc, "Email:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Date of birth:': extract_text(input_doc, "Date of Birth:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Gender:': extract_text(input_doc, "Gender:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Ethnicity:': extract_text(input_doc, "Ethnicity:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Iwi / Hapū (if Māori):' : extract_text(input_doc, "Iwi / Hapū (if Māori):", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'First language:': extract_text(input_doc, "First Language (if not English):", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Interpreter required:': extract_text(input_doc, "Interpreter Required:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    'Cultural support required:': extract_text(input_doc, "Cultural Support Required:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    "Communication needs:": extract_text(input_doc, "Communication Needs:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    "Preferred contact method:": extract_text(input_doc, "Preferred Contact Method:", "Section 1: Personal Information", "Section 2: Medical Information"),
-    "Name of GP:": extract_text(input_doc, "Doctor/GP Name:", "Section 2: Medical Information", "Section 3: Disability Information"),
-    "GP’s phone number:": extract_text(input_doc, "Medical Centre Contact Number:", "Section 2: Medical Information", "Section 3: Disability Information"),
-    "Primary disability:": split_disabilities(extract_text(input_doc, "Disability Name/Type:", "Section 3: Disability Information", "Section 4: Additional Information"))[0],
-    "Interim eligibility:": extract_text(input_doc, "Interim Eligibility:", "Section 1: Personal Information", "Section 2: Medical Information") or "No",
-}
-
-alt_contact = {
-    'Last name:': split_name(extract_text(input_doc, "Name (First & Last):", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details"))[1],
-    'First name': split_name(extract_text(input_doc, "Name (First & Last):", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details"))[0],
-    'Address:': extract_text(input_doc, "Address:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-    'Home phone:': extract_text(input_doc, "Contact Number:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-    'Mobile:': extract_text(input_doc, "Contact Number:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-    'Email:': extract_text(input_doc, "Email:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-    'Relationship to client:': extract_text(input_doc, "Relationship to the Person Referred:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-    'Date of birth:': extract_text(input_doc, "Date of Birth:", "Section 5: Alternative Contact (Optional)", "Section 6: Referrer’s Contact Details") or "N/A",
-}
-
-disability_diagnosis = {
-    '[Details]': extract_text(input_doc, "Disability Name/Type:", "Section 3: Disability Information", "Section 4: Additional Information"),
-}
+    try:
+        response = send_file(
+            processed_document,
+            as_attachment=True,
+            download_name=os.path.basename(processed_document),
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
+        return response
+    except Exception as e:
+        # logging.error(f"Error sending file: {e}")
+        return "Error sending file", 500
 
 
+def run_flask_app():
+    """Run the Flask app."""
+    app.run(port=5000, debug=True, use_reloader=False)
 
-# Fill the output document with all required data
-fill_fields(output_doc, assessment_details, "Assessment Information", "Client Details")
-fill_fields(output_doc, client_details, "Client Details", "Disability / Diagnosis Details")
-fill_fields(output_doc, alt_contact, "Alternative Contact Details", "Emergency Contact Details")
-insert_bullet_points(output_doc, disability_diagnosis, "Disability / Diagnosis Details", "Reason for Assessment / Referral to Taikura Trust")
+if __name__ == '__main__':
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
 
+    if not os.access(UPLOAD_FOLDER, os.W_OK):
+        raise PermissionError(f"Cannot write to upload folder: {UPLOAD_FOLDER}")
+    if not os.access(PROCESSED_FOLDER, os.W_OK):
+        raise PermissionError(f"Cannot write to processed folder: {PROCESSED_FOLDER}")
 
-
-
-date_created = datetime.now().strftime("%d-%m-%Y")
-output_doc.save(f"{date_created}_OutputForm.docx")
-print("Data has been transferred and appended successfully.")
+    run_flask_app()
