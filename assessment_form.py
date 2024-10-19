@@ -1,7 +1,6 @@
 from openai import OpenAI
 import fitz
 import os
-import pythoncom
 import time
 from docx2pdf import convert
 from docx import Document
@@ -23,16 +22,14 @@ def convert_to_pdf(docx_path):
         print(f"{docx_path} does not exist.")
         raise FileNotFoundError(f"{docx_path} does not exist.")
 
+def convert_docx_to_pdf(docx_path):
     try:
-        pythoncom.CoInitialize()
         pdf_path = docx_path.replace(".docx", ".pdf")
-        convert(docx_path, pdf_path)
+        convert(docx_path, pdf_path)  # Converts the DOCX file to PDF
         return pdf_path
     except Exception as e:
         print(f"Error converting {docx_path} to PDF: {str(e)}")
         raise
-    finally:
-        pythoncom.CoUninitialize()
 
 def save_form_data_to_doc(form_data):
     doc = Document()
