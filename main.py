@@ -13,10 +13,19 @@ app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 app.config['ALLOWED_EXTENSIONS_AUDIO'] = ALLOWED_EXTENSIONS_AUDIO
 app.config['ALLOWED_EXTENSIONS_TEXT'] = ALLOWED_EXTENSIONS_TEXT
 
+
+# create folder
+def create_folders():
+    """Create the necessary folders for file uploads and processed files."""
+    for folder in [UPLOAD_FOLDER, PROCESSED_FOLDER]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
 # Routes
 @app.route('/')
 def index():
     """Render the main index page."""
+    create_folders()
     return render_template('index.html')
 
 @app.route('/referral-form')
