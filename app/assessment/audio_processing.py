@@ -17,35 +17,36 @@ def process_audio(audio_path):
         filename = os.path.splitext(os.path.basename(audio_path))[0]
 
         processed_audio_paths = []
+
+        # Transcribe each processed chunk and combine transcriptions
+        full_transcription = ""
         
         # Process each chunk
         for i, chunk in enumerate(make_chunks(audio, CHUNK_LENGTH_MS)):
             processed_chunk = process_chunks(chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD)
             processed_chunk_path = os.path.join(PROCESSED_FOLDER, f"{filename}_chunk{i}.wav")
+            
+            # Export chunk to temporary file
             processed_chunk.export(processed_chunk_path, format="wav")
-            processed_audio_paths.append(processed_chunk_path)
-
-        # Transcribe each processed chunk and combine transcriptions
-        full_transcription = ""
-        
-        for processed_path in processed_audio_paths:
-            transcription = process_client_audio(processed_path)
+            
+            # Transcribe the processed chunk
+            transcription = process_client_audio(processed_chunk_path)
             full_transcription += transcription + "\n\n"
-
-        # clean up chunks
-        for processed_path in processed_audio_paths:
+            
+            # Remove chunk file after processing to free up memory
             try:
-                if os.path.exists(processed_path):  # Check if the file exists before removing
-                    os.remove(processed_path)
-                    print(f"Removed: {processed_path}")
+                if os.path.exists(processed_chunk_path):
+                    os.remove(processed_chunk_path)
+                    print(f"Removed: {processed_chunk_path}")
                 else:
-                    print(f"File not found, skipping removal: {processed_path}")
+                    print(f"File not found, skipping removal: {processed_chunk_path}")
             except Exception as e:
-                print(f"Error removing {processed_path}: {e}")
-
+                print(f"Error removing {processed_chunk_path}: {e}")
+        
         print(f"Processing time: {time.time() - start_time} seconds")
         print(f"Full transcription: {full_transcription}")
-        # Save transcription and convert to PDF
+
+        # Save the full transcription and convert it to a PDF
         pdf_path = save_audio_transcription_to_pdf(full_transcription, filename, PROCESSED_FOLDER)
         return pdf_path
     except Exception as e:
