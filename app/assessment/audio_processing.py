@@ -3,7 +3,7 @@ import sys
 from pydub import AudioSegment
 from pydub.utils import make_chunks
 import time
-from app.constants import PROCESSED_DIR, CHUNK_LENGTH_MS, SILENCE_THRESHOLD, MIN_SILENCE_LEN, PROCESSED_FOLDER
+from app.constants import CHUNK_LENGTH_MS, SILENCE_THRESHOLD, MIN_SILENCE_LEN, PROCESSED_FOLDER
 from app.audioHelpers import process_chunks
 from app.documentProcessing import save_audio_transcription_to_pdf
 from app.chatgptCompletions import process_client_audio
@@ -15,8 +15,6 @@ def process_audio(audio_path):
         # Load audio and clean previous files
         audio = AudioSegment.from_file(audio_path)
         filename = os.path.splitext(os.path.basename(audio_path))[0]
-
-        processed_audio_paths = []
 
         # Transcribe each processed chunk and combine transcriptions
         full_transcription = ""

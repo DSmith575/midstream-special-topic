@@ -25,6 +25,8 @@ filelock==3.16.0
 Flask==3.0.3
 fonttools==4.53.1
 fsspec==2024.9.0
+gevent==24.10.3
+greenlet==3.1.1
 gunicorn==23.0.0
 h11==0.14.0
 httpcore==1.0.6
@@ -88,6 +90,7 @@ requests==2.32.3
 scikit-learn==1.5.1
 scipy==1.14.1
 semantic-version==2.10.0
+setuptools==75.2.0
 setuptools-rust==1.10.1
 simplejson==3.19.3
 six==1.16.0
@@ -102,3 +105,5 @@ typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.2.2
 Werkzeug==3.0.4
+zope.event==5.0
+zope.interface==7.1.0
