@@ -1,14 +1,12 @@
 import os
-import gc
 import sys
 from pydub import AudioSegment
 from pydub.utils import make_chunks
-import whisper
-import torch
 import time
 from app.constants import PROCESSED_DIR, CHUNK_LENGTH_MS, SILENCE_THRESHOLD, MIN_SILENCE_LEN
 from app.audioHelpers import process_chunks, transcribe_audio
 from app.documentProcessing import save_audio_transcription_to_pdf
+from app.chatgptCompletions import process_client_audio
 
 def process_audio(audio_path):
     """Main processing function: chunk audio, process, transcribe, and convert."""
@@ -17,14 +15,6 @@ def process_audio(audio_path):
         # Load audio and clean previous files
         audio = AudioSegment.from_file(audio_path)
         filename = os.path.splitext(os.path.basename(audio_path))[0]
-        # Process and combine chunks
-        # processed_audio = sum([process_chunks(chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD) for chunk in make_chunks(audio, CHUNK_LENGTH_MS)])
-        # processed_wav_path = os.path.join(PROCESSED_DIR, f"{filename}.wav")
-        # processed_audio.export(processed_wav_path, format="wav")
-
-        # # Load Whisper model and transcribe
-        # model = whisper.load_model("large", device="cuda" if torch.cuda.is_available() else "cpu")
-        # transcription = transcribe_audio(model, processed_wav_path)
 
         processed_audio_paths = []  # List to hold paths of processed audio chunks
         
@@ -35,25 +25,28 @@ def process_audio(audio_path):
             processed_chunk.export(processed_chunk_path, format="wav")
             processed_audio_paths.append(processed_chunk_path)
 
-            gc.collect()  # Clean up memory
-
         # Transcribe each processed chunk and combine transcriptions
-        model = whisper.load_model("large", device="cuda" if torch.cuda.is_available() else "cpu")
         full_transcription = ""
         
         for processed_path in processed_audio_paths:
-            transcription = transcribe_audio(model, processed_path)
-            full_transcription += transcription['text'] + " "  # Accumulate transcriptions
+            transcription = process_client_audio(processed_path)
+            full_transcription += transcription + "\n\n"
 
-        # Save transcription and convert to PDF
-        pdf_path = save_audio_transcription_to_pdf(transcription, filename, PROCESSED_DIR)
-
-        print(f"Processed transcription saved as PDF: {pdf_path}")
-        print(f"Processing time: {time.time() - start_time:.2f} seconds")
-
+        # clean up chunks
         for processed_path in processed_audio_paths:
-            os.remove(processed_path)
+            try:
+                if os.path.exists(processed_path):  # Check if the file exists before removing
+                    os.remove(processed_path)
+                    print(f"Removed: {processed_path}")
+                else:
+                    print(f"File not found, skipping removal: {processed_path}")
+            except Exception as e:
+                print(f"Error removing {processed_path}: {e}")
 
+        print(f"Processing time: {time.time() - start_time} seconds")
+        print(f"Full transcription: {full_transcription}")
+        # Save transcription and convert to PDF
+        pdf_path = save_audio_transcription_to_pdf(full_transcription, filename, PROCESSED_DIR)
         return pdf_path
     except Exception as e:
         raise

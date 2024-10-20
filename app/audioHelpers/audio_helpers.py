@@ -1,13 +1,7 @@
-import torch
 from pydub import AudioSegment
 from pydub.silence import detect_silence
-from pydub.utils import make_chunks
 import noisereduce as nr
 import numpy as np
-import whisper
-
-
-
 
 def process_chunks(chunk, min_silence_len, silence_threshold):
     """Reduce noise and trim silence from an audio chunk."""

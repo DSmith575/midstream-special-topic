@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -8,9 +9,30 @@ api_key = os.getenv('OPENAI_API_KEY')
 
 client = OpenAI(api_key=api_key)
 
+def process_client_audio(audio_path):
+    """Main processing function: chunk audio, process, transcribe, and convert."""
+    try:
+        with open(audio_path, "rb") as audio_file:  # Automatically closes the file
+            # Transcribe audio using OpenAI's Whisper model
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+                response_format="text"
+            )
+
+        cleaned_transcript = re.sub(r'[^\w\s,.?!;:()-]', '', transcript)
+        print("Transcript:", cleaned_transcript)
+
+        return transcript
+    except Exception as e:
+        print(f"Failed to process audio: {e}")
+        return None
+
 def get_relevant_information(section, text):
-    prompt = (f"Based on the following text, does the person mentioned have any issues related to {section}? "
-              f"If yes, provide details. Text: {text}")
+    prompt = (f"Based on the following text, does the person mentioned have any issues related to {section}? do not include asking if there are any issues, just provide the information.\n\n"
+              f"If yes, provide details. Text: {text} try to turn it into a usable narrative.\n\n"
+              f"If there is nothing related to {section}, please indicate that there are no issues related to {section}."
+              )
     
     try:
         response = client.chat.completions.create(
@@ -34,14 +56,14 @@ def analyze_completions_for_form(text):
     sections = {
         'Household Management': [
             'Faecal smearing', 'Administering personal finances', 'Garden / lawns', 
-            # 'Home safety', 'Laundry', 'Operating home heating appliances', 
-            # 'Meal preparation', 'Shopping for necessary items', 'Other housework'
+            'Home safety', 'Laundry', 'Operating home heating appliances', 
+            'Meal preparation', 'Shopping for necessary items', 'Other housework'
         ],
         'Self-care': [
             'Bathing, showering, washing self', 'Bed mobility', 'Dressing and / or undressing', 
-            # 'Eating and drinking', 'Faecal smearing', 'Grooming and caring for body parts', 
-            # 'Managing / preventing health problems', 'Managing medication', 
-            # 'Menstrual management', 'Night Care', 'Night settling', 'Toileting'
+            'Eating and drinking', 'Faecal smearing', 'Grooming and caring for body parts', 
+            'Managing / preventing health problems', 'Managing medication', 
+            'Menstrual management', 'Night Care', 'Night settling', 'Toileting'
         ],
         # Add other sections accordingly
     }

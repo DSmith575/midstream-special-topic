@@ -71,7 +71,13 @@ def upload_audio():
     # Check if processed document is valid and exists
     if not isinstance(processed_document, str) or not os.path.exists(processed_document):
         return "Processed file not found", 404
-
+    
+    # remove files from uploads
+    try:
+        os.remove(filepath)
+    except Exception as e:
+        return "Error removing file", 500
+    
     # Send processed file for download
     try:
         response = send_file(
@@ -117,7 +123,13 @@ def upload_pdf():
     
     if not isinstance(processed_document, str) or not os.path.exists(processed_document):
         return "Processed file not found", 404
+    
 
+    try:
+        os.remove(filepath)
+    except Exception as e:
+        return "Error removing file", 500
+    
     try:
         response = send_file(
             processed_document,
@@ -125,6 +137,7 @@ def upload_pdf():
             download_name=os.path.basename(processed_document),
         )
         response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
+        
         return response
     except Exception as e:
         return "Error sending file", 500
