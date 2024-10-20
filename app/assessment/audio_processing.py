@@ -1,4 +1,5 @@
 import os
+import gc
 import sys
 from pydub import AudioSegment
 from pydub.utils import make_chunks
@@ -38,8 +39,11 @@ def process_audio(audio_path):
                     print(f"Removed: {processed_chunk_path}")
                 else:
                     print(f"File not found, skipping removal: {processed_chunk_path}")
+
             except Exception as e:
                 print(f"Error removing {processed_chunk_path}: {e}")
+                
+            gc.collect()
         
         print(f"Processing time: {time.time() - start_time} seconds")
         print(f"Full transcription: {full_transcription}")
