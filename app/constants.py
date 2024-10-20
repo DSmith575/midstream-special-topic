@@ -4,7 +4,8 @@ import sys
 PROCESSED_DIR='processed'
 UPLOADS_DIR='uploads'
 
-CHUNK_LENGTH_MS = 120000  # 2 minutes
+# CHUNK_LENGTH_MS = 120000  # 2 minutes
+CHUNK_LENGTH_MS = 10000  # 10 seconds
 SILENCE_THRESHOLD = -30    # in dBFS
 MIN_SILENCE_LEN = 1000     # in milliseconds
 
