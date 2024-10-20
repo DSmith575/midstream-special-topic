@@ -1,128 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MidStream Referral Form</title>
-    <style></style>
-  </head>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MidStream Referral Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1,
+    h2 {
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 80px;
+    }
+
+    button {
+      background-color: #5cb85c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4cae4c;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Test</h1>
+  <button onclick="goBack()" aria-label="Go back" tabindex="0" class="mb-2">
+    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+    Go Back
+  </button>
 
   <body>
-    <h1>Test</h1>
-    <button onclick="goBack()" aria-label="Go back" tabindex="0" class="mb-2">
-      <i class="fas fa-arrow-left" aria-hidden="true"></i>
-      Go Back
-    </button>
+    <div class="container">
+      <h1>Referral Form</h1>
 
-    <body>
-      <div class="container">
-          <h1>Referral Form</h1>
-          
-          <!-- Section 1: Personal Information -->
-          <section>
-              <h2>Section 1: Personal Information</h2>
-              <label for="name">Name (First & Last):</label>
-              <input type="text" id="name" value="John Doe">
-  
-              <label for="title">Title (Mr/Mrs/Ms/etc.):</label>
-              <input type="text" id="title" value="Mr.">
-  
-              <label for="preferredName">Preferred Name:</label>
-              <input type="text" id="preferredName" value="John">
-  
-              <label for="address">Address:</label>
-              <input type="text" id="address" value="123 Example Street, Sampleville, Region, 12345">
-  
-              <label for="contactNumber">Contact Number:</label>
-              <input type="text" id="contactNumber" value="021 123 4567">
-  
-              <label for="email">Email:</label>
-              <input type="email" id="email" value="john.doe@example.com">
-  
-              <label for="preferredContact">Preferred Contact Method:</label>
-              <select id="preferredContact">
-                  <option>Phone</option>
-                  <option>Email</option>
-              </select>
-  
-              <label for="dob">Date of Birth:</label>
-              <input type="date" id="dob" value="2004-08-14">
-  
-              <label for="gender">Gender:</label>
-              <input type="text" id="gender" value="Male">
-  
-              <label for="pronoun">Pronoun:</label>
-              <input type="text" id="pronoun" value="He">
-  
-              <label for="residency">Residency Status:</label>
-              <input type="text" id="residency" value="NZ Citizen">
-  
-              <label for="ethnicity">Ethnicity:</label>
-              <input type="text" id="ethnicity" value="NZ European">
-  
-              <label for="iwi">Iwi / Hapū (if Māori):</label>
-              <input type="text" id="iwi" value="N/A">
-  
-              <label for="language">First Language (if not English):</label>
-              <input type="text" id="language" value="N/A">
-  
-              <label for="interpreter">Interpreter Required:</label>
-              <select id="interpreter">
-                  <option>No</option>
-                  <option>Yes</option>
-              </select>
-  
-              <label for="culturalSupport">Cultural Support Required:</label>
-              <select id="culturalSupport">
-                  <option>No</option>
-                  <option>Yes</option>
-              </select>
-  
-              <label for="communicationNeeds">Communication Needs:</label>
-              <textarea id="communicationNeeds">Yes, Non-verbal communication (requires anticipation and support)</textarea>
-          </section>
-  
-          <!-- Section 2: Medical Information -->
-          <section>
-              <h2>Section 2: Medical Information</h2>
-              <label for="doctor">Doctor/GP Name:</label>
-              <input type="text" id="doctor" value="Dr. Jane Carter">
-  
-              <label for="medicalCentre">Medical Centre Address:</label>
-              <input type="text" id="medicalCentre" value="456 Health Avenue, Sampleville, Region">
-  
-              <label for="medicalContact">Medical Centre Contact Number:</label>
-              <input type="text" id="medicalContact" value="09 123 4567">
-  
-              <label for="nhi">National Health Index (NHI) Number:</label>
-              <input type="text" id="nhi" value="XYZ1234">
-  
-              <label for="diagnosis">Attach Confirmation of Diagnosis Form:</label>
-              <input type="file" id="diagnosis">
-          </section>
-  
-          <!-- Other sections (Section 3-8) -->
-          <!-- Skipping additional sections for brevity -->
-          
-          <!-- Section 8: Signatory -->
-          <section>
-              <h2>Section 8: Signatory</h2>
-              <label for="signature">Signature Method:</label>
-              <select id="signature">
-                  <option>Digital Signature</option>
-                  <option>Handwritten</option>
-              </select>
-  
-              <label for="parentName">Name of Parent/Guardian (if on behalf of a child):</label>
-              <input type="text" id="parentName" value="Jane Smith">
-  
-              <label for="signDate">Date:</label>
-              <input type="date" id="signDate" value="2023-10-15">
-          </section>
-  
-          <!-- Submit Button -->
-          <button id="submitBtn">Submit Form</button>
-      </div>
+      <!-- Section 1: Personal Information -->
+      <section>
+        <h2>Section 1: Personal Information</h2>
+        <label for="name">Name (First & Last):</label>
+        <input type="text" id="name" value="John Doe">
+
+        <label for="title">Title (Mr/Mrs/Ms/etc.):</label>
+        <input type="text" id="title" value="Mr.">
+
+        <label for="preferredName">Preferred Name:</label>
+        <input type="text" id="preferredName" value="John">
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" value="123 Example Street, Sampleville, Region, 12345">
+
+        <label for="contactNumber">Contact Number:</label>
+        <input type="text" id="contactNumber" value="021 123 4567">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" value="john.doe@example.com">
+
+        <label for="preferredContact">Preferred Contact Method:</label>
+        <select id="preferredContact">
+          <option>Phone</option>
+          <option>Email</option>
+        </select>
+
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" value="2004-08-14">
+
+        <label for="gender">Gender:</label>
+        <input type="text" id="gender" value="Male">
+
+        <label for="pronoun">Pronoun:</label>
+        <input type="text" id="pronoun" value="He">
+
+        <label for="residency">Residency Status:</label>
+        <input type="text" id="residency" value="NZ Citizen">
+
+        <label for="ethnicity">Ethnicity:</label>
+        <input type="text" id="ethnicity" value="NZ European">
+
+        <label for="iwi">Iwi / Hapū (if Māori):</label>
+        <input type="text" id="iwi" value="N/A">
+
+        <label for="language">First Language (if not English):</label>
+        <input type="text" id="language" value="N/A">
+
+        <label for="interpreter">Interpreter Required:</label>
+        <select id="interpreter">
+          <option>No</option>
+          <option>Yes</option>
+        </select>
+
+        <label for="culturalSupport">Cultural Support Required:</label>
+        <select id="culturalSupport">
+          <option>No</option>
+          <option>Yes</option>
+        </select>
+
+        <label for="communicationNeeds">Communication Needs:</label>
+        <textarea id="communicationNeeds">Yes, Non-verbal communication (requires anticipation and support)</textarea>
+      </section>
+
+      <!-- Section 2: Medical Information -->
+      <section>
+        <h2>Section 2: Medical Information</h2>
+        <label for="doctor">Doctor/GP Name:</label>
+        <input type="text" id="doctor" value="Dr. Jane Carter">
+
+        <label for="medicalCentre">Medical Centre Address:</label>
+        <input type="text" id="medicalCentre" value="456 Health Avenue, Sampleville, Region">
+
+        <label for="medicalContact">Medical Centre Contact Number:</label>
+        <input type="text" id="medicalContact" value="09 123 4567">
+
+        <label for="nhi">National Health Index (NHI) Number:</label>
+        <input type="text" id="nhi" value="XYZ1234">
+      </section>
+
+      <!-- Other sections (Section 3-8) -->
+      <!-- Skipping additional sections for brevity -->
+
+      <!-- Section 8: Signatory -->
+      <section>
+        <h2>Section 8: Signatory</h2>
+        <label for="signature">Signature Method:</label>
+        <select id="signature">
+          <option>Digital Signature</option>
+          <option>Handwritten</option>
+        </select>
+
+        <label for="parentName">Name of Parent/Guardian (if on behalf of a child):</label>
+        <input type="text" id="parentName" value="Jane Smith">
+
+        <label for="signDate">Date:</label>
+        <input type="date" id="signDate" value="2023-10-15">
+      </section>
+
+      <!-- Submit Button -->
+      <button id="submitBtn">Submit Form</button>
+    </div>
 
     <script>
       const goBack = () => {
@@ -130,6 +189,7 @@
       };
     </script>
   </body>
+
 </html>
 
 
