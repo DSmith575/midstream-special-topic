@@ -3,8 +3,8 @@ import sys
 from pydub import AudioSegment
 from pydub.utils import make_chunks
 import time
-from app.constants import PROCESSED_DIR, CHUNK_LENGTH_MS, SILENCE_THRESHOLD, MIN_SILENCE_LEN
-from app.audioHelpers import process_chunks, transcribe_audio
+from app.constants import PROCESSED_DIR, CHUNK_LENGTH_MS, SILENCE_THRESHOLD, MIN_SILENCE_LEN, PROCESSED_FOLDER
+from app.audioHelpers import process_chunks
 from app.documentProcessing import save_audio_transcription_to_pdf
 from app.chatgptCompletions import process_client_audio
 
@@ -16,12 +16,12 @@ def process_audio(audio_path):
         audio = AudioSegment.from_file(audio_path)
         filename = os.path.splitext(os.path.basename(audio_path))[0]
 
-        processed_audio_paths = []  # List to hold paths of processed audio chunks
+        processed_audio_paths = []
         
         # Process each chunk
         for i, chunk in enumerate(make_chunks(audio, CHUNK_LENGTH_MS)):
             processed_chunk = process_chunks(chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD)
-            processed_chunk_path = os.path.join(PROCESSED_DIR, f"{filename}_chunk{i}.wav")
+            processed_chunk_path = os.path.join(PROCESSED_FOLDER, f"{filename}_chunk{i}.wav")
             processed_chunk.export(processed_chunk_path, format="wav")
             processed_audio_paths.append(processed_chunk_path)
 
@@ -46,7 +46,7 @@ def process_audio(audio_path):
         print(f"Processing time: {time.time() - start_time} seconds")
         print(f"Full transcription: {full_transcription}")
         # Save transcription and convert to PDF
-        pdf_path = save_audio_transcription_to_pdf(full_transcription, filename, PROCESSED_DIR)
+        pdf_path = save_audio_transcription_to_pdf(full_transcription, filename, PROCESSED_FOLDER)
         return pdf_path
     except Exception as e:
         raise

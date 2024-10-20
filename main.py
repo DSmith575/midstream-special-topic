@@ -116,7 +116,7 @@ def upload_pdf():
         return "Failed to save PDF file", 500
 
     try:
-        processed_document = process_data(filepath)
+        processed_document = process_data(filepath, filename, app.config['PROCESSED_FOLDER'])
 
     except Exception as e:
         return "An error occurred during processing", 500
@@ -148,12 +148,4 @@ def run_flask_app():
     app.run(port=5000)
 
 if __name__ == '__main__':
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
-
-    if not os.access(UPLOAD_FOLDER, os.W_OK):
-        raise PermissionError(f"Cannot write to upload folder: {UPLOAD_FOLDER}")
-    if not os.access(PROCESSED_FOLDER, os.W_OK):
-        raise PermissionError(f"Cannot write to processed folder: {PROCESSED_FOLDER}")
-
     run_flask_app()

@@ -2,20 +2,14 @@
 from app.documentProcessing import save_form_data_to_pdf, extract_text_from_pdf
 from app.chatgptCompletions import analyze_completions_for_form
 import time
-from app.constants import PROCESSED_DIR, UPLOADS_DIR
-import os
 
-def create_directories():
-    os.makedirs(PROCESSED_DIR, exist_ok=True)
-    os.makedirs(UPLOADS_DIR, exist_ok=True)
 
-def process_data(pdf_path):
+def process_data(pdf_path, filename, process_path):
     try:
-        create_directories()
         start_time = time.time()
         extracted_text = extract_text_from_pdf(pdf_path)
         form_data = analyze_completions_for_form(extracted_text)
-        save_doc = save_form_data_to_pdf(form_data, PROCESSED_DIR)
+        save_doc = save_form_data_to_pdf(form_data, filename, process_path)
 
         print(f"Processed data saved as PDF: {pdf_path}")
 

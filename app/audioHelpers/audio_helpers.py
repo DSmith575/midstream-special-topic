@@ -18,9 +18,3 @@ def process_chunks(chunk, min_silence_len, silence_threshold):
                               silence_thresh=silence_threshold)
     print("SILENCES", silences)
     return audio[silences[0][0]:silences[-1][1]] if silences else audio
-
-def transcribe_audio(model ,audio_path):
-    print("HELLO")
-    """Use Whisper model to transcribe audio."""
-
-    return model.transcribe(audio_path, language="en", verbose=True)

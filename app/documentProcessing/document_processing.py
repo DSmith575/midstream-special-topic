@@ -45,9 +45,8 @@ def save_audio_transcription_to_pdf(transcription, filename, uploads_dir):
         return None
 
 
-def save_form_data_to_pdf(form_data, uploads_dir):
-    output_filename = 'processed_data.pdf'
-    output_filepath = os.path.join(uploads_dir, output_filename)
+def save_form_data_to_pdf(form_data, filename, uploads_dir):
+    output_filepath = os.path.join(uploads_dir, filename)
 
     try:
         # Create a PDF document
