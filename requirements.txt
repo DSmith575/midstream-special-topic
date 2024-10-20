@@ -6,6 +6,7 @@ blinker==1.8.2
 bottle==0.13.1
 certifi==2024.8.30
 cffi==1.17.1
+chardet==5.2.0
 charset-normalizer==3.3.2
 ci-info==0.3.0
 click==8.1.7
@@ -18,11 +19,9 @@ cycler==0.12.1
 decorator==5.1.1
 distro==1.9.0
 docx==0.2.4
-docx2pdf==0.1.8
 etelemetry==0.3.1
 exceptiongroup==1.2.2
 filelock==3.16.0
-# fitz==0.0.1.dev2
 Flask==3.0.3
 fonttools==4.53.1
 fsspec==2024.9.0
@@ -56,7 +55,7 @@ noisereduce==3.0.2
 numba==0.60.0
 numpy==2.0.2
 openai==1.52.0
-openai-whisper
+openai-whisper==20240930
 packaging==24.1
 pandas==2.2.3
 pathlib==1.0.1
@@ -81,9 +80,11 @@ python-dotenv==1.0.1
 pythonnet==3.0.4
 pytz==2024.2
 pywebview==5.2
+pywin32-ctypes==0.2.3
 pyxnat==1.6.2
 rdflib==6.3.2
 regex==2024.7.24
+reportlab==4.2.5
 requests==2.32.3
 scikit-learn==1.5.1
 scipy==1.14.1

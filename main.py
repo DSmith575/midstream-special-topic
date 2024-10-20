@@ -1,53 +1,17 @@
-from flask import Flask, render_template, request, redirect, send_file, jsonify
-import subprocess
+from flask import Flask, render_template, request, redirect, send_file
 import os
-import sys
-from audio_processing import process_audio
-from assessment_form import process_data
-import re
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.assessment.audio_processing import process_audio
+from app.assessment.assessment_form import process_data
+from app.constants import UPLOAD_FOLDER, PROCESSED_FOLDER, ALLOWED_EXTENSIONS_AUDIO, ALLOWED_EXTENSIONS_TEXT
+from app.fileUploads.file_uploads import allowed_file, sanitize_filename, handle_exception
 
 app = Flask(__name__)
-app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-
-# Base directories for file uploads and processing
-BASE_DIR = os.path.dirname(os.path.abspath(sys.executable)) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-PROCESSED_FOLDER = os.path.join(BASE_DIR, 'processed')
-ALLOWED_EXTENSIONS = {'wav', 'mp3', 'm4a', 'mp4', 'pdf'}
 
 # Flask app configuration
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
-app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
-# app.config['ALLOWED_TEXT_EXTENSIONS'] = ALLOWED_TEXT_EXTENSIONS
-
-# Utility functions
-def is_ffmpeg_installed():
-    """Check if FFmpeg is installed."""
-    try:
-        subprocess.run(['ffmpeg', '-version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return True
-    except FileNotFoundError:
-        return False
-
-def allowed_file(filename):
-    """Check if the file is allowed based on the extension."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-
-def sanitize_filename(filename):
-    """Sanitize the filename by removing or replacing invalid characters."""
-    name = os.path.splitext(filename)[0]
-    return re.sub(r'[^a-zA-Z0-9_\-]', '-', name)
-
-def handle_exception(e):
-    """Log and return an error message as JSON."""
-    # logging.error(f"An error occurred: {str(e)}")
-    # logging.error(traceback.format_exc())
-    return jsonify({"error": str(e)}), 500
+app.config['ALLOWED_EXTENSIONS_AUDIO'] = ALLOWED_EXTENSIONS_AUDIO
+app.config['ALLOWED_EXTENSIONS_TEXT'] = ALLOWED_EXTENSIONS_TEXT
 
 # Routes
 @app.route('/')
@@ -74,41 +38,38 @@ def assessment_form():
 def upload_audio():
     """Handle audio file upload and processing."""
     if 'file' not in request.files:
-        # logging.error("No file part in the request.")
         return redirect(request.url)
 
     file = request.files['file']
     if file.filename == '':
-        # logging.error("No file selected.")
+        print("NO FILE")
         return redirect(request.url)
 
-    if not allowed_file(file.filename):
-        # logging.error("Invalid file extension.")
+    if not allowed_file(file.filename, app.config['ALLOWED_EXTENSIONS_AUDIO']):
+        print("NOT ALLOWED")
         return redirect(request.url)
 
     filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
+    print("FILENAME", filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    # logging.info(f"File uploaded: {filename}")
+    print("FILEPATH", filepath)
 
     # Save uploaded file
     try:
         file.save(filepath)
-        # logging.info(f"File saved to {filepath}")
+        print("FILE SAVED", filepath)
     except Exception as e:
-        # logging.error(f"Failed to save file: {e}")
+        print(f"Failed to save file: {e}")  # Log the error
         return "Failed to save file", 500
 
     # Process the audio file
     try:
         processed_document = process_audio(filepath)
-        # logging.info(f"Audio processed: {processed_document}")
     except Exception as e:
-        # logging.error(f"Audio processing failed: {e}")
         return "An error occurred during audio processing", 500
 
     # Check if processed document is valid and exists
     if not isinstance(processed_document, str) or not os.path.exists(processed_document):
-        # logging.error("Processed file not found or invalid.")
         return "Processed file not found", 404
 
     # Send processed file for download
@@ -121,7 +82,6 @@ def upload_audio():
         response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
         return response
     except Exception as e:
-        # logging.error(f"Error sending file: {e}")
         return "Error sending file", 500
     
 @app.route('/upload-pdf', methods=['POST'])
@@ -136,14 +96,12 @@ def upload_pdf():
     if file.filename == '':
         return redirect(request.url)
 
-    if not allowed_file(file.filename):
+    if not allowed_file(file.filename, app.config['ALLOWED_EXTENSIONS_TEXT']):
         return redirect(request.url)
     
 
     filename = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
-    print("SANITIZED FILENAME", filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print("FILEPATH", filepath)
 
     try:
         file.save(filepath)
@@ -155,10 +113,9 @@ def upload_pdf():
         processed_document = process_data(filepath)
 
     except Exception as e:
-        return "An error occured during processing", 500
+        return "An error occurred during processing", 500
     
     if not isinstance(processed_document, str) or not os.path.exists(processed_document):
-        # logging.error("Processed file not found or invalid.")
         return "Processed file not found", 404
 
     try:
@@ -170,13 +127,11 @@ def upload_pdf():
         response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}"'
         return response
     except Exception as e:
-        # logging.error(f"Error sending file: {e}")
         return "Error sending file", 500
 
 
 def run_flask_app():
     """Run the Flask app."""
-    # app.run(port=5000, debug=True, use_reloader=False)
     app.run(port=5000)
 
 if __name__ == '__main__':
