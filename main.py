@@ -154,7 +154,7 @@ def upload_pdf():
 
 def run_flask_app():
     """Run the Flask app."""
-    app.run(port=5000, host='0.0.0.0')
+    app.run(port=5000, host='0.0.0.0', debug=True)
 
 if __name__ == '__main__':
     run_flask_app()

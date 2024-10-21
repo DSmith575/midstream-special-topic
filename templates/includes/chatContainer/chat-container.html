@@ -1,0 +1,47 @@
+    <div class="chat-container">
+        <textarea class="chat-input" placeholder="Type your message..."></textarea>
+        <button class="send-button">Send</button>
+    </div>
+
+    <style>
+        .chat-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            padding: 10px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+        }
+
+        .chat-input {
+            width: 85%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #3498db;
+        }
+
+        .send-button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .send-button:hover {
+      background-color: #2980b9;
+    }
+    </style>

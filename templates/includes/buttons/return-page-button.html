@@ -1,0 +1,26 @@
+<button onclick="goBack()" aria-label="Go back" tabindex="0" class="goBackButton">
+    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+    Home
+  </button>
+
+  <script>
+          const goBack = () => {
+        window.history.back();
+      };
+  </script>
+
+<style>
+    .goBackButton {
+        background-color: #3498db;
+        position: absolute;
+        top: 25px;
+        right: 20px;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+</style>

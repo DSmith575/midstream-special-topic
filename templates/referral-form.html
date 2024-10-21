@@ -5,17 +5,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MidStream Referral Form</title>
+  <link href="{{url_for('static',filename='css/main.css')}}" rel="stylesheet" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 20px;
-    }
-
     .container {
       max-width: 800px;
-      margin: 0 auto;
       background-color: white;
       padding: 20px;
       border-radius: 8px;
@@ -53,8 +46,9 @@
       height: 80px;
     }
 
-    button {
-      background-color: #5cb85c;
+    .prevBtn, .nextBtn {
+      background-color: #3498db;
+      
       color: white;
       padding: 10px 20px;
       border: none;
@@ -66,22 +60,41 @@
     button:hover {
       background-color: #4cae4c;
     }
+
+    .progress-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 25px;
+    margin-bottom: 20px;
+  }
+
+  .progress-bar {
+    height: 20px;
+    width: 0%;
+    background-color: #4caf50;
+    border-radius: 25px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+  }
+
+
   </style>
 </head>
 
 <body>
-  <h1>Test</h1>
-  <button onclick="goBack()" aria-label="Go back" tabindex="0" class="mb-2">
-    <i class="fas fa-arrow-left" aria-hidden="true"></i>
-    Go Back
-  </button>
+  <header>{% include 'includes/navbar.html' %}</header>
+  {% include 'includes/buttons/return-page-button.html' %}
 
   <body>
-    <div class="container">
+    <section class="container">
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
       <h1>Referral Form</h1>
-      <form class="referralForm">
+      <form class="referralForm" id="referralForm">
       <!-- Section 1: Personal Information -->
-      <section class="sectionOne">
+      <section class="step" id="step1">
         <h2 id="sectionOneHeader">Section 1: Personal Information</h2>
         <label for="clientFirstName">First Name :</label>
         <input type="text" id="clientFirstName" value="John" placeholder="John">
@@ -145,10 +158,11 @@
 
         <label for="communicationNeeds">Communication Needs:</label>
         <textarea id="communicationNeeds">Yes, Non-verbal communication (requires anticipation and support)</textarea>
+        <button type="button" class="nextBtn" onclick="nextStep(1)">Next</button>
       </section>
 
       <!-- Section 2: Medical Information -->
-      <section class="sectionTwo">
+      <section class="step" id="step2" style="display:none">
         <h2 id="sectionTwoHeader">Section 2: Medical Information</h2>
         <label for="doctor">Doctor/GP Name:</label>
         <input type="text" id="doctor" value="Dr. Jane Carter">
@@ -161,9 +175,11 @@
 
         <label for="nhi">National Health Index (NHI) Number:</label>
         <input type="text" id="nhi" value="XYZ1234">
+        <button type="button" class="prevBtn" onclick="prevStep(2)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(2)">Next</button>
       </section>
 
-      <section class="sectionThree">
+      <section class="step" id="step3" style="display:none">
         <h2 id="sectionThreeHeader">Section 3: Disability Information</h2>
         <label for="disabilityName">Disability Name/Type:</label>
         <input type="text" id="disabilityName" value="Autism Spectrum Disorder" placeholder="Autism Spectrum Disorder">
@@ -183,9 +199,11 @@
           <option>Semi-urgent (required within one week)</option>
           <option>Non-urgent (required within one month)</option>
         </select>
+        <button type="button" class="prevBtn" onclick="prevStep(3)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(3)">Next</button>
       </section>
 
-      <section class="sectionFour">
+      <section class="step" id="step4" style="display:none">
         <h2 id="sectionFourHeader">Section 4: Additional Information:</h2>
 
         <label for="safetyHazards">Safety, Hazards, or Sensitive Issues</label>
@@ -193,9 +211,11 @@
 
         <label for="otherImportantInformation">Other Important Information</label>
         <textarea id="otherImportantInformation">Requires a high level of support for daily living tasks</textarea>
+        <button type="button" class="prevBtn" onclick="prevStep(4)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(4)">Next</button>
       </section>
 
-      <section class="sectionFive">
+      <section class="step" id="step5" style="display:none">
         <h2 id="sectionFiveHeader">Section 5: Referrer Information</h2>
 
         <label for="altContact">Alternative Contact:</label>
@@ -212,9 +232,11 @@
 
         <label for="relationship">Relationship to Client:</label>
         <input type="text" id="relationship" value="Parent" placeholder="Parent">
+        <button type="button" class="prevBtn" onclick="prevStep(5)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(5)">Next</button>
       </section>
 
-      <section class="sectionSix">
+      <section class="step" id="step6" style="display:none">
         <h2 id="sectionSixHeader">Section 6: Referrer's Contact Details:</h2>
 
         <label for="referrerFirstName">Name:</label>
@@ -231,9 +253,11 @@
 
         <label for="referrerRelationship">Relationship to Person Referred:</label>
         <input type="text" id="referrerRelationship" value="Father" placeholder="Father">
+        <button type="button" class="prevBtn" onclick="prevStep(6)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(6)">Next</button>
       </section>
 
-      <section class="sectionSeven">
+      <section class="step" id="step7" style="display:none">
         <h2 id="sectionSevenHeader">Section 7: Consent & Privacy</h2>
 
         <label for="consent">Consent to Provide Information:</label>
@@ -265,13 +289,12 @@
           <option>Yes</option>
           <option>No</option>
         </select>
+        <button type="button" class="prevBtn" onclick="prevStep(7)">Previous</button>
+        <button type="button" class="nextBtn" onclick="nextStep(7)">Next</button>
       </section>
 
-      <!-- Other sections (Section 3-8) -->
-      <!-- Skipping additional sections for brevity -->
-
       <!-- Section 8: Signatory -->
-      <section class="sectionEight">
+      <section class="step" id="step8" style="display:none">
         <h2 id="sectionEightHeader">Section 8: Signatory</h2>
         <label for="signature">Signature Method:</label>
         <select id="signature">
@@ -284,17 +307,51 @@
 
         <label for="signDate">Date:</label>
         <input type="date" id="signDate" value="2023-10-15" placeholder="2023-10-15">
+        <button type="button" class="prevBtn" onclick="prevStep(8)">Previous</button>
+        <button id="submitBtn">Submit Form</button>
       </section>
-
       <!-- Submit Button -->
-      <button id="submitBtn">Submit Form</button>
     </form>
-    </div>
+    </section>
 
     <script>
-      const goBack = () => {
-        window.history.back();
-      };
+
+
+      let currentStep = 1;
+      const totalSteps = 8;
+
+      window.onload = stepLoader = () => {
+        updateProgressBar();
+  const steps = document.querySelectorAll('.step');
+  steps.forEach((step, index) => {
+    if (index === 0) {
+      step.style.display = 'block';
+    } else {
+      step.style.display = 'none';
+    }
+  });
+};
+
+const updateProgressBar = () => {
+    const progressBar = document.getElementById("progressBar");
+    const progressPercentage = (currentStep / totalSteps) * 100;
+    progressBar.style.width = progressPercentage + "%";
+    progressBar.innerText = Math.round(progressPercentage) + "%";
+  };
+
+const nextStep = (step) => {
+    document.getElementById(`step${step}`).style.display = 'none';
+    document.getElementById(`step${step + 1}`).style.display = 'block';
+    currentStep = step + 1;
+    updateProgressBar();
+  }
+
+  const prevStep = (step) => {
+    document.getElementById(`step${step}`).style.display = 'none';
+    document.getElementById(`step${step - 1}`).style.display = 'block';
+    currentStep = step - 1;
+    updateProgressBar();
+  }
 
       const submitForm = (event) => {
       event.preventDefault();
@@ -381,15 +438,3 @@
   </body>
 
 </html>
-
-
-<!-- <button onclick="goBack()" aria-label="Go back" tabindex="0" class="mb-2">
-  <i class="fas fa-arrow-left" aria-hidden="true"></i>
-  Go Back
-</button>
-
-<script>
-  const goBack = () => {
-    window.history.back();
-  };
-</script> -->

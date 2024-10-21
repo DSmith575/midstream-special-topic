@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MidStream Audio Processing</title>
+    <link href="{{url_for('static',filename='css/main.css')}}" rel="stylesheet" />
+
     <style>
       .disabled-button {
         background-color: grey;
@@ -54,7 +56,6 @@
         background-color: white;
         padding: 20px;
         border-radius: 10px;
-        background-color: white;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -68,16 +69,6 @@
         border-color: #673ab7 transparent #673ab7 transparent;
         animation: rotate 1.5s linear infinite;
       }
-
-      button {
-      background-color: #5cb85c;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
 
       @keyframes rotate {
         100% {
@@ -105,15 +96,16 @@
         border-radius: 5px;
         cursor: pointer;
       }
+
     </style>
   </head>
 
   <body>
+    <header>{% include 'includes/navbar.html' %}</header>
+
+    {% include 'includes/buttons/return-page-button.html' %}
+    <section>
     <h1>Upload Audio File</h1>
-    <button onclick="goBack()" aria-label="Go back" tabindex="0" class="mb-2">
-      <i class="fas fa-arrow-left" aria-hidden="true"></i>
-      Go Back
-    </button>
     <p style="color: red">
       Ensure FFmpeg is installed. Please install it from
       <a href="https://ffmpeg.org/download.html">here</a>.
@@ -155,6 +147,7 @@
         >Download PDF</a
       >
     </div>
+  </section>
 
     <script>
       const form = document.getElementById("upload-audio");
@@ -223,9 +216,6 @@
         }
       });
 
-      const goBack = () => {
-        window.history.back();
-      };
     </script>
   </body>
 </html>
