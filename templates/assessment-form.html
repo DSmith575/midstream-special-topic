@@ -113,28 +113,56 @@
       font-size: 16px;
       cursor: pointer;
     }
+
+    .assessmentHeader {
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .upload-pdf {
+      padding: 20px;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .upload-button {
+      padding: 10px;
+      width: 500px;
+      border-radius: 5px;
+      border: 1px solid #3498db;
+      cursor: pointer;
+    }
+
+    .referral-pdf {
+      margin-top: 20px;
+    }
+
   </style>
 </head>
 
 <body>
-  <header>{% include 'includes/navbar.html' %}</header>
-  {% include 'includes/buttons/return-page-button.html' %}
-  <h1>Assessment Form</h1>
+  <header>{% include 'includes/navbar/navbar.html' %}</header>
+  <h1 class="assessmentHeader">Assessment Form</h1>
 
   <form class="upload-pdf" action="/upload-pdf" id="upload-pdf" method="post" enctype="multipart/form-data">
+    <label class="audio-pdf" for="file">Upload Audio PDF:</label>
     <input type="file" name="file" required class="upload-button" />
+
+    <label class="referral-pdf" for="name">Upload Referral Form PDF:</label>
+    <input type="file" name="file" required class="upload-button" />
+    
     <input class="submit-btn" type="submit" value="Upload" aria-busy="false" />
   </form>
+
+
 
   <div id="overlay" class="overlay" aria-hidden="true">
     <div class="container">
       <div class="spinner" id="spinner" role="status" aria-live="polite"></div>
       <p>Processing PDF...</p>
     </div>
-  </div>
-
-  <div id="confirmation" class="confirmation" style="display: none">
-    <p>Assessment submitted successfully!</p>
   </div>
 
   <div id="pdf-container" class="pdf-container" style="display: none">
@@ -147,7 +175,7 @@
     const form = document.getElementById("upload-pdf");
     const submitBtn = document.getElementsByClassName("submit-btn")[0];
     const overlay = document.getElementById("overlay");
-    const confirmation = document.getElementById("confirmation");
+
     const pdfContainer = document.getElementById("pdf-container");
     const pdfViewer = document.getElementById("pdf-viewer");
     const downloadBtn = document.getElementById("download-btn");
@@ -190,9 +218,6 @@
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-
-        // Show confirmation message
-        confirmation.style.display = "block";
 
         pdfViewer.src = url;
         pdfContainer.style.display = "block";

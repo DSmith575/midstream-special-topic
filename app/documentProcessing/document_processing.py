@@ -97,3 +97,43 @@ def extract_text_from_pdf(filepath):
     except Exception as e:
         print(f"Error extracting text from PDF: {e} - File: {filepath}")
         return None
+    
+
+def save_referral_form_to_pdf(form_data, first_name, last_name, uploads_dir):
+    pdf_filename = f"{first_name}-{last_name}.pdf"
+    pdf_filepath = os.path.join(uploads_dir, pdf_filename)
+
+    try:
+        doc = SimpleDocTemplate(pdf_filepath, pagesize=A4)
+        story = []
+
+        styles = getSampleStyleSheet()
+        heading_style = ParagraphStyle(
+            'ColoredHeading',
+            parent=styles['Heading2'],
+            textColor=colors.blue
+        )
+        paragraph_style = styles['BodyText']
+
+        # Add title
+        story.append(Paragraph(f'{first_name} {last_name} Referral Form' , styles['Title']))
+        story.append(Spacer(1, 12))  # Add space after title
+
+        # Iterate through each section in the data object
+        for section_key, section_value in form_data.items():
+            # Add the section header
+            story.append(Paragraph(section_value['header'], heading_style))
+            story.append(Spacer(1, 6))  # Space after header
+            
+            # Add the content of the section
+            for field, value in section_value.items():
+                if field != 'header':  # Skip the header field
+                    story.append(Paragraph(f"{field.replace('_', ' ').title()}: {value}", paragraph_style))
+            
+            story.append(Spacer(1, 12))  # Space after each section
+
+        # Build the PDF
+        doc.build(story)
+        return pdf_filepath
+    except Exception as e:
+        print(f"An error occurred while creating the PDF: {e}")

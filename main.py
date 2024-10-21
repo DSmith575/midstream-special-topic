@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, send_file
 import os
 from app.assessment.audio_processing import process_audio
 from app.assessment.assessment_form import process_data
+from app.assessment.referral_form import process_referral
 from app.constants import UPLOAD_FOLDER, PROCESSED_FOLDER, ALLOWED_EXTENSIONS_AUDIO, ALLOWED_EXTENSIONS_TEXT
 from app.fileUploads.file_uploads import allowed_file, sanitize_filename, handle_exception
 
@@ -98,6 +99,36 @@ def upload_audio():
         return response
     except Exception as e:
         return "Error sending file", 500
+    
+@app.route('/upload-referral-form', methods=['POST'])
+def upload_referral_form():
+    """Handle referral form upload and processing."""
+
+    try:
+        ref_data = request.get_json()
+        if ref_data is None:
+            return "No data received", 400
+        print("REF DATA", ref_data)
+
+        processed_document = process_referral(ref_data)
+
+    except Exception as e:
+        return "An error occurred during processing", 500
+    
+    if not isinstance(processed_document, str) or not os.path.exists(processed_document):
+        return "Processed file not found", 404
+    
+    try:
+        response = send_file(
+            processed_document,
+            as_attachment=True,
+            download_name=os.path.basename(processed_document),
+        )
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(processed_document)}'
+        return response
+    except Exception as e:
+        return "Error sending file", 500
+    
     
 @app.route('/upload-pdf', methods=['POST'])
 def upload_pdf():

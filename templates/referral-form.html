@@ -7,17 +7,15 @@
   <title>MidStream Referral Form</title>
   <link href="{{url_for('static',filename='css/main.css')}}" rel="stylesheet" />
   <style>
-    .container {
+    .ref-container {
       max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
       background-color: white;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1,
-    h2 {
-      color: #333;
     }
 
     label {
@@ -35,7 +33,7 @@
       padding: 8px;
       margin-top: 5px;
       margin-bottom: 15px;
-      
+
       border-radius: 4px;
       border: 1px solid #ccc;
       font-size: 14px;
@@ -46,9 +44,10 @@
       height: 80px;
     }
 
-    .prevBtn, .nextBtn {
+    .prevBtn,
+    .nextBtn {
       background-color: #3498db;
-      
+
       color: white;
       padding: 10px 20px;
       border: none;
@@ -62,377 +61,503 @@
     }
 
     .progress-container {
-    width: 100%;
-    background-color: #f3f3f3;
-    border-radius: 25px;
-    margin-bottom: 20px;
-  }
+      width: 100%;
+      background-color: #f3f3f3;
+      border-radius: 25px;
+      margin-bottom: 20px;
+    }
 
-  .progress-bar {
-    height: 20px;
-    width: 0%;
-    background-color: #4caf50;
-    border-radius: 25px;
-    text-align: center;
-    line-height: 20px;
-    color: white;
-  }
+    .progress-bar {
+      height: 20px;
+      width: 0%;
+      background-color: #4caf50;
+      border-radius: 25px;
+      text-align: center;
+      line-height: 20px;
+      color: white;
+    }
 
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
 
+    .container {
+      position: absolute;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .spinner {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 6px solid #673ab7;
+      border-color: #673ab7 transparent #673ab7 transparent;
+      animation: rotate 1.5s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .pdf-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    iframe {
+      width: 80%;
+      height: 500px;
+      border: 1px solid #ccc;
+    }
+
+    .download-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
 <body>
-  <header>{% include 'includes/navbar.html' %}</header>
-  {% include 'includes/buttons/return-page-button.html' %}
+  <header>{% include 'includes/navbar/navbar.html' %}</header>
 
   <body>
-    <section class="container">
+    <section class="ref-container">
       <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
       </div>
       <h1>Referral Form</h1>
-      <form class="referralForm" id="referralForm">
-      <!-- Section 1: Personal Information -->
-      <section class="step" id="step1">
-        <h2 id="sectionOneHeader">Section 1: Personal Information</h2>
-        <label for="clientFirstName">First Name :</label>
-        <input type="text" id="clientFirstName" value="John" placeholder="John">
+      <form class="referralForm" id="referralForm" action="/upload-referral-form" method="post">
+        <!-- Section 1: Personal Information -->
+        <section class="step" id="step1">
+          <h2 id="sectionOneHeader">Section 1: Personal Information</h2>
+          <label for="clientFirstName">First Name :</label>
+          <input type="text" id="clientFirstName" value="John" placeholder="John">
 
-        <label for="clientLastName">Last Name:</label>
-        <input type="text" id="clientLastName" value="Doe" placeholder="Doe">
+          <label for="clientLastName">Last Name:</label>
+          <input type="text" id="clientLastName" value="Doe" placeholder="Doe">
 
-        <label for="title">Title (Mr/Mrs/Ms/etc.):</label>
-        <input type="text" id="title" value="" placeholder="Mr/Mrs/Ms/etc">
+          <label for="title">Title (Mr/Mrs/Ms/etc.):</label>
+          <input type="text" id="title" value="" placeholder="Mr/Mrs/Ms/etc">
 
-        <label for="preferredName">Preferred Name:</label>
-        <input type="text" id="preferredName" value="" placeholder="John">
+          <label for="preferredName">Preferred Name:</label>
+          <input type="text" id="preferredName" value="" placeholder="John">
 
-        <label for="address">Address:</label>
-        <input type="text" id="address" value="" placeholder="123 Example Street, Sampleville, Region, 12345">
+          <label for="address">Address:</label>
+          <input type="text" id="address" value="" placeholder="123 Example Street, Sampleville, Region, 12345">
 
-        <label for="contactNumber">Contact Number:</label>
-        <input type="text" id="contactNumber" value="" placeholder="0211234567">
+          <label for="contactNumber">Contact Number:</label>
+          <input type="text" id="contactNumber" value="" placeholder="0211234567">
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" value="" placeholder="john.doe@example.com">
+          <label for="email">Email:</label>
+          <input type="email" id="email" value="" placeholder="john.doe@example.com">
 
-        <label for="preferredContact">Preferred Contact Method:</label>
-        <select id="preferredContact">
-          <option>Phone</option>
-          <option>Email</option>
-        </select>
+          <label for="preferredContact">Preferred Contact Method:</label>
+          <select id="preferredContact">
+            <option>Phone</option>
+            <option>Email</option>
+          </select>
 
-        <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="" placeholder="1970-01-01">
+          <label for="dob">Date of Birth:</label>
+          <input type="date" id="dob" value="" placeholder="1970-01-01">
 
-        <label for="gender">Gender:</label>
-        <input type="text" id="gender" value="" placeholder="Male">
+          <label for="gender">Gender:</label>
+          <input type="text" id="gender" value="" placeholder="Male">
 
-        <label for="pronoun">Pronoun:</label>
-        <input type="text" id="pronoun" value="" placeholder="he">
+          <label for="pronoun">Pronoun:</label>
+          <input type="text" id="pronoun" value="" placeholder="he">
 
-        <label for="residency">Residency Status:</label>
-        <input type="text" id="residency" value="" placeholder="NZ Citizen">
+          <label for="residency">Residency Status:</label>
+          <input type="text" id="residency" value="" placeholder="NZ Citizen">
 
-        <label for="ethnicity">Ethnicity:</label>
-        <input type="text" id="ethnicity" value="" placeholder="NZ European">
+          <label for="ethnicity">Ethnicity:</label>
+          <input type="text" id="ethnicity" value="" placeholder="NZ European">
 
-        <label for="iwi">Iwi / Hapū (if Māori):</label>
-        <input type="text" id="iwi" value="N/A" placeholder="N/A">
+          <label for="iwi">Iwi / Hapū (if Māori):</label>
+          <input type="text" id="iwi" value="N/A" placeholder="N/A">
 
-        <label for="language">First Language (if not English):</label>
-        <input type="text" id="language" value="N/A" placeholder="N/A">
+          <label for="language">First Language (if not English):</label>
+          <input type="text" id="language" value="N/A" placeholder="N/A">
 
-        <label for="interpreter">Interpreter Required:</label>
-        <select id="interpreter">
-          <option>No</option>
-          <option>Yes</option>
-        </select>
+          <label for="interpreter">Interpreter Required:</label>
+          <select id="interpreter">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
 
-        <label for="culturalSupport">Cultural Support Required:</label>
-        <select id="culturalSupport">
-          <option>No</option>
-          <option>Yes</option>
-        </select>
+          <label for="culturalSupport">Cultural Support Required:</label>
+          <select id="culturalSupport">
+            <option>No</option>
+            <option>Yes</option>
+          </select>
 
-        <label for="communicationNeeds">Communication Needs:</label>
-        <textarea id="communicationNeeds">Yes, Non-verbal communication (requires anticipation and support)</textarea>
-        <button type="button" class="nextBtn" onclick="nextStep(1)">Next</button>
-      </section>
+          <label for="communicationNeeds">Communication Needs:</label>
+          <textarea id="communicationNeeds">Yes, Non-verbal communication (requires anticipation and support)</textarea>
+          <button type="button" class="nextBtn" onclick="nextStep(1)">Next</button>
+        </section>
 
-      <!-- Section 2: Medical Information -->
-      <section class="step" id="step2" style="display:none">
-        <h2 id="sectionTwoHeader">Section 2: Medical Information</h2>
-        <label for="doctor">Doctor/GP Name:</label>
-        <input type="text" id="doctor" value="Dr. Jane Carter">
+        <!-- Section 2: Medical Information -->
+        <section class="step" id="step2" style="display:none">
+          <h2 id="sectionTwoHeader">Section 2: Medical Information</h2>
+          <label for="doctor">Doctor/GP Name:</label>
+          <input type="text" id="doctor" value="Dr. Jane Carter">
 
-        <label for="medicalCentre">Medical Centre Address:</label>
-        <input type="text" id="medicalCentre" value="456 Health Avenue, Sampleville, Region">
+          <label for="medicalCentre">Medical Centre Address:</label>
+          <input type="text" id="medicalCentre" value="456 Health Avenue, Sampleville, Region">
 
-        <label for="medicalContact">Medical Centre Contact Number:</label>
-        <input type="text" id="medicalContact" value="091234567" placeholder="091234567">
+          <label for="medicalContact">Medical Centre Contact Number:</label>
+          <input type="text" id="medicalContact" value="091234567" placeholder="091234567">
 
-        <label for="nhi">National Health Index (NHI) Number:</label>
-        <input type="text" id="nhi" value="XYZ1234">
-        <button type="button" class="prevBtn" onclick="prevStep(2)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(2)">Next</button>
-      </section>
+          <label for="nhi">National Health Index (NHI) Number:</label>
+          <input type="text" id="nhi" value="XYZ1234">
+          <button type="button" class="prevBtn" onclick="prevStep(2)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(2)">Next</button>
+        </section>
 
-      <section class="step" id="step3" style="display:none">
-        <h2 id="sectionThreeHeader">Section 3: Disability Information</h2>
-        <label for="disabilityName">Disability Name/Type:</label>
-        <input type="text" id="disabilityName" value="Autism Spectrum Disorder" placeholder="Autism Spectrum Disorder">
+        <section class="step" id="step3" style="display:none">
+          <h2 id="sectionThreeHeader">Section 3: Disability Information</h2>
+          <label for="disabilityName">Disability Name/Type:</label>
+          <input type="text" id="disabilityName" value="Autism Spectrum Disorder"
+            placeholder="Autism Spectrum Disorder">
 
-        <label for="otherMedical">Other Medical/Health Issues (if any)</label>
-        <textarea id="otherMedical">Sleep disturbances, Sensory processing issues</textarea>
+          <label for="otherMedical">Other Medical/Health Issues (if any)</label>
+          <textarea id="otherMedical">Sleep disturbances, Sensory processing issues</textarea>
 
-        <label for="reasonForReferral">Reason for Referral:</label>
-        <textarea id="reasonForReferral">Behavioural support, Social skills development</textarea>
+          <label for="reasonForReferral">Reason for Referral:</label>
+          <textarea id="reasonForReferral">Behavioural support, Social skills development</textarea>
 
-        <label for="supportNeeds">Supports/Services Desired</label>
-        <textarea id="supportNeeds">Behavioural support, Social skills development</textarea>
+          <label for="supportNeeds">Supports/Services Desired</label>
+          <textarea id="supportNeeds">Behavioural support, Social skills development</textarea>
 
-        <label for="urgencyOfServices">Urgency of Services/Support Needs</label>
-        <select id="urgencyOfServices">
-          <option>Urgent (required within 24 hours)</option>
-          <option>Semi-urgent (required within one week)</option>
-          <option>Non-urgent (required within one month)</option>
-        </select>
-        <button type="button" class="prevBtn" onclick="prevStep(3)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(3)">Next</button>
-      </section>
+          <label for="urgencyOfServices">Urgency of Services/Support Needs</label>
+          <select id="urgencyOfServices">
+            <option>Urgent (required within 24 hours)</option>
+            <option>Semi-urgent (required within one week)</option>
+            <option>Non-urgent (required within one month)</option>
+          </select>
+          <button type="button" class="prevBtn" onclick="prevStep(3)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(3)">Next</button>
+        </section>
 
-      <section class="step" id="step4" style="display:none">
-        <h2 id="sectionFourHeader">Section 4: Additional Information:</h2>
+        <section class="step" id="step4" style="display:none">
+          <h2 id="sectionFourHeader">Section 4: Additional Information:</h2>
 
-        <label for="safetyHazards">Safety, Hazards, or Sensitive Issues</label>
-        <textarea id="safetyHazards">Tendency to wander off</textarea>
+          <label for="safetyHazards">Safety, Hazards, or Sensitive Issues</label>
+          <textarea id="safetyHazards">Tendency to wander off</textarea>
 
-        <label for="otherImportantInformation">Other Important Information</label>
-        <textarea id="otherImportantInformation">Requires a high level of support for daily living tasks</textarea>
-        <button type="button" class="prevBtn" onclick="prevStep(4)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(4)">Next</button>
-      </section>
+          <label for="otherImportantInformation">Other Important Information</label>
+          <textarea id="otherImportantInformation">Requires a high level of support for daily living tasks</textarea>
+          <button type="button" class="prevBtn" onclick="prevStep(4)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(4)">Next</button>
+        </section>
 
-      <section class="step" id="step5" style="display:none">
-        <h2 id="sectionFiveHeader">Section 5: Referrer Information</h2>
+        <section class="step" id="step5" style="display:none">
+          <h2 id="sectionFiveHeader">Section 5: Referrer Information</h2>
 
-        <label for="altContact">Alternative Contact:</label>
-        <input type="text" id="altFirstName" value="Jane" placeholder="Jane">
+          <label for="altContact">Alternative Contact:</label>
+          <input type="text" id="altFirstName" value="Jane" placeholder="Jane">
 
-        <label for="altLastName">Last Name:</label>
-        <input type="text" id="altLastName" value="Doe" placeholder="Doe">
+          <label for="altLastName">Last Name:</label>
+          <input type="text" id="altLastName" value="Doe" placeholder="Doe">
 
-        <label for="altContactNumber">Contact Number:</label>
-        <input type="text" id="altContactNumber" value="0211234567" placeholder="0211234567">
+          <label for="altContactNumber">Contact Number:</label>
+          <input type="text" id="altContactNumber" value="0211234567" placeholder="0211234567">
 
-        <label for="altEmail">Email:</label>
-        <input type="email" id="altEmail" value="JaneDoe@email.com" placeholder="JaneDoe@email.com">
+          <label for="altEmail">Email:</label>
+          <input type="email" id="altEmail" value="JaneDoe@email.com" placeholder="JaneDoe@email.com">
 
-        <label for="relationship">Relationship to Client:</label>
-        <input type="text" id="relationship" value="Parent" placeholder="Parent">
-        <button type="button" class="prevBtn" onclick="prevStep(5)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(5)">Next</button>
-      </section>
+          <label for="relationship">Relationship to Client:</label>
+          <input type="text" id="relationship" value="Parent" placeholder="Parent">
+          <button type="button" class="prevBtn" onclick="prevStep(5)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(5)">Next</button>
+        </section>
 
-      <section class="step" id="step6" style="display:none">
-        <h2 id="sectionSixHeader">Section 6: Referrer's Contact Details:</h2>
+        <section class="step" id="step6" style="display:none">
+          <h2 id="sectionSixHeader">Section 6: Referrer's Contact Details:</h2>
 
-        <label for="referrerFirstName">Name:</label>
-        <input type="text" id="referrerFirstName" value="John" placeholder="John">
+          <label for="referrerFirstName">Name:</label>
+          <input type="text" id="referrerFirstName" value="John" placeholder="John">
 
-        <label for="referrerLastName">Last Name:</label>
-        <input type="text" id="referrerLastName" value="Smith" placeholder="Smith">
+          <label for="referrerLastName">Last Name:</label>
+          <input type="text" id="referrerLastName" value="Smith" placeholder="Smith">
 
-        <label for="referrerContactNumber">Contact Number:</label>
-        <input type="text" id="referrerContactNumber" value="0211234567" placeholder="0211234567">
+          <label for="referrerContactNumber">Contact Number:</label>
+          <input type="text" id="referrerContactNumber" value="0211234567" placeholder="0211234567">
 
-        <label for="referrerEmail">Email:</label>
-        <input type="email" id="referrerEmail" value="JohnSmith@email.com" placeholder="0211234567">
+          <label for="referrerEmail">Email:</label>
+          <input type="email" id="referrerEmail" value="JohnSmith@email.com" placeholder="0211234567">
 
-        <label for="referrerRelationship">Relationship to Person Referred:</label>
-        <input type="text" id="referrerRelationship" value="Father" placeholder="Father">
-        <button type="button" class="prevBtn" onclick="prevStep(6)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(6)">Next</button>
-      </section>
+          <label for="referrerRelationship">Relationship to Person Referred:</label>
+          <input type="text" id="referrerRelationship" value="Father" placeholder="Father">
+          <button type="button" class="prevBtn" onclick="prevStep(6)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(6)">Next</button>
+        </section>
 
-      <section class="step" id="step7" style="display:none">
-        <h2 id="sectionSevenHeader">Section 7: Consent & Privacy</h2>
+        <section class="step" id="step7" style="display:none">
+          <h2 id="sectionSevenHeader">Section 7: Consent & Privacy</h2>
 
-        <label for="consent">Consent to Provide Information:</label>
-        <select id="consent">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
+          <label for="consent">Consent to Provide Information:</label>
+          <select id="consent">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
 
-        <label for="shareInformation">Consent to Share Information for assessment:</label>
-        <select id="shareInformation">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
+          <label for="shareInformation">Consent to Share Information for assessment:</label>
+          <select id="shareInformation">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
 
-        <label for="contactConsent">Consent to Be Contacted for Verification/Additional Information:</label>
-        <select id="contactConsent">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
+          <label for="contactConsent">Consent to Be Contacted for Verification/Additional Information:</label>
+          <select id="contactConsent">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
 
-        <label for="consentStatReporting">Consent for Statistical Reporting:</label>
-        <select id="consentStatReporting">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
+          <label for="consentStatReporting">Consent for Statistical Reporting:</label>
+          <select id="consentStatReporting">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
 
-        <label for="accessInformation">Right to Access/Correct Provided Information:</label>
-        <select id="accessInformation">
-          <option>Yes</option>
-          <option>No</option>
-        </select>
-        <button type="button" class="prevBtn" onclick="prevStep(7)">Previous</button>
-        <button type="button" class="nextBtn" onclick="nextStep(7)">Next</button>
-      </section>
+          <label for="accessInformation">Right to Access/Correct Provided Information:</label>
+          <select id="accessInformation">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+          <button type="button" class="prevBtn" onclick="prevStep(7)">Previous</button>
+          <button type="button" class="nextBtn" onclick="nextStep(7)">Next</button>
+        </section>
 
-      <!-- Section 8: Signatory -->
-      <section class="step" id="step8" style="display:none">
-        <h2 id="sectionEightHeader">Section 8: Signatory</h2>
-        <label for="signature">Signature Method:</label>
-        <select id="signature">
-          <option>Digital Signature</option>
-          <option>Handwritten</option>
-        </select>
+        <!-- Section 8: Signatory -->
+        <section class="step" id="step8" style="display:none">
+          <h2 id="sectionEightHeader">Section 8: Signatory</h2>
+          <label for="signature">Signature Method:</label>
+          <select id="signature">
+            <option>Digital Signature</option>
+            <option>Handwritten</option>
+          </select>
 
-        <label for="parentName">Name of Parent/Guardian (if on behalf of a child):</label>
-        <input type="text" id="parentName" value="Jane Smith" placeholder="Jane Smith">
+          <label for="parentName">Name of Parent/Guardian (if on behalf of a child):</label>
+          <input type="text" id="parentName" value="Jane Smith" placeholder="Jane Smith">
 
-        <label for="signDate">Date:</label>
-        <input type="date" id="signDate" value="2023-10-15" placeholder="2023-10-15">
-        <button type="button" class="prevBtn" onclick="prevStep(8)">Previous</button>
-        <button id="submitBtn">Submit Form</button>
-      </section>
-      <!-- Submit Button -->
-    </form>
+          <label for="signDate">Date:</label>
+          <input type="date" id="signDate" value="2023-10-15" placeholder="2023-10-15">
+          <button type="button" class="prevBtn" onclick="prevStep(8)">Previous</button>
+          <button id="submitBtn">Submit Form</button>
+        </section>
+        <!-- Submit Button -->
+      </form>
+
+      <div id="overlay" class="overlay" aria-hidden="true">
+        <div class="container">
+          <div class="spinner" id="spinner" role="status" aria-live="polite"></div>
+          <p>Processing audio...</p>
+          <p>Do not refresh or close the page</p>
+        </div>
+      </div>
+
+      <div id="pdf-container" class="pdf-container" style="display: none">
+        <iframe id="pdf-viewer"></iframe>
+        <br />
+        <a id="download-btn" class="download-btn" href="#" download="">Download PDF</a>
+      </div>
     </section>
 
     <script>
-
-
       let currentStep = 1;
       const totalSteps = 8;
+      const form = document.getElementById('referralForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const overlay = document.getElementById("overlay");
+      const pdfContainer = document.getElementById("pdf-container");
+      const pdfViewer = document.getElementById("pdf-viewer");
+      const downloadBtn = document.getElementById("download-btn");
 
       window.onload = stepLoader = () => {
         updateProgressBar();
-  const steps = document.querySelectorAll('.step');
-  steps.forEach((step, index) => {
-    if (index === 0) {
-      step.style.display = 'block';
-    } else {
-      step.style.display = 'none';
-    }
-  });
-};
+        const steps = document.querySelectorAll('.step');
+        steps.forEach((step, index) => {
+          if (index === 0) {
+            step.style.display = 'block';
+          } else {
+            step.style.display = 'none';
+          }
+        });
+      };
 
-const updateProgressBar = () => {
-    const progressBar = document.getElementById("progressBar");
-    const progressPercentage = (currentStep / totalSteps) * 100;
-    progressBar.style.width = progressPercentage + "%";
-    progressBar.innerText = Math.round(progressPercentage) + "%";
-  };
+      const updateProgressBar = () => {
+        const progressBar = document.getElementById("progressBar");
+        const progressPercentage = (currentStep / totalSteps) * 100;
+        progressBar.style.width = progressPercentage + "%";
+        progressBar.innerText = Math.round(progressPercentage) + "%";
+      };
 
-const nextStep = (step) => {
-    document.getElementById(`step${step}`).style.display = 'none';
-    document.getElementById(`step${step + 1}`).style.display = 'block';
-    currentStep = step + 1;
-    updateProgressBar();
-  }
+      const nextStep = (step) => {
+        document.getElementById(`step${step}`).style.display = 'none';
+        document.getElementById(`step${step + 1}`).style.display = 'block';
+        currentStep = step + 1;
+        updateProgressBar();
+      }
 
-  const prevStep = (step) => {
-    document.getElementById(`step${step}`).style.display = 'none';
-    document.getElementById(`step${step - 1}`).style.display = 'block';
-    currentStep = step - 1;
-    updateProgressBar();
-  }
+      const prevStep = (step) => {
+        document.getElementById(`step${step}`).style.display = 'none';
+        document.getElementById(`step${step - 1}`).style.display = 'block';
+        currentStep = step - 1;
+        updateProgressBar();
+      }
 
-      const submitForm = (event) => {
-      event.preventDefault();
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        submitBtn.value = "Uploading...";
+        overlay.style.display = "block";
+        overlay.setAttribute("aria-hidden", "false");
+        submitBtn.setAttribute("aria-busy", "true");
+        lastStep = document.getElementById(`step8`);
+        lastStep.style.display = 'none';
+
         const formData = {
-        section1: {
-          header: document.getElementById('sectionOneHeader').textContent,
-          firstName: document.getElementById('clientFirstName').value,
-          lastName: document.getElementById('clientLastName').value,
-          title: document.getElementById('title').value,
-          preferredName: document.getElementById('preferredName').value,
-          address: document.getElementById('address').value,
-          contactNumber: document.getElementById('contactNumber').value,
-          email: document.getElementById('email').value,
-          preferredContact: document.getElementById('preferredContact').value,
-          dob: document.getElementById('dob').value,
-          gender: document.getElementById('gender').value,
-          pronoun: document.getElementById('pronoun').value,
-          residency: document.getElementById('residency').value,
-          ethnicity: document.getElementById('ethnicity').value,
-          iwi: document.getElementById('iwi').value,
-          firstLanguage: document.getElementById('language').value,
-          interpreter: document.getElementById('interpreter').value,
-          culturalSupport: document.getElementById('culturalSupport').value,
-          communicationNeeds: document.getElementById('communicationNeeds').value,
-        },
-        section2: {
-          header: document.getElementById('sectionTwoHeader').textContent,
-          doctor: document.getElementById('doctor').value,
-          medicalCentre: document.getElementById('medicalCentre').value,
-          medicalContact: document.getElementById('medicalContact').value,
-          nhi: document.getElementById('nhi').value,
-        },
-        section3: {
-          header: document.getElementById('sectionThreeHeader').textContent,
-          disabilityName: document.getElementById('disabilityName').value,
-          otherMedical: document.getElementById('otherMedical').value,
-          reasonForReferral: document.getElementById('reasonForReferral').value,
-          supportNeeds: document.getElementById('supportNeeds').value,
-          urgencyOfServices: document.getElementById('urgencyOfServices').value,
-        },
-        section4: {
-          header: document.getElementById('sectionFourHeader').textContent,
-          safetyHazards: document.getElementById('safetyHazards').value,
-          otherImportantInformation: document.getElementById('otherImportantInformation').value,
-        },
-        section5: {
-          header: document.getElementById('sectionFiveHeader').textContent,
-          altFirstName: document.getElementById('altFirstName').value,
-          altLastName: document.getElementById('altLastName').value,
-          altContactNumber: document.getElementById('altContactNumber').value,
-          altEmail: document.getElementById('altEmail').value,
-          relationship: document.getElementById('relationship').value,
-        },
-        section6: {
-          header: document.getElementById('sectionSixHeader').textContent,
-          referrerFirstName: document.getElementById('referrerFirstName').value,
-          referrerLastName: document.getElementById('referrerLastName').value,
-          referrerContactNumber: document.getElementById('referrerContactNumber').value,
-          referrerEmail: document.getElementById('referrerEmail').value,
-          referrerRelationship: document.getElementById('referrerRelationship').value,
-        },
-        section7: {
-          header: document.getElementById('sectionSevenHeader').textContent,
-          consent: document.getElementById('consent').value,
-          shareInformation: document.getElementById('shareInformation').value,
-          contactConsent: document.getElementById('contactConsent').value,
-          consentStatReporting: document.getElementById('consentStatReporting').value,
-          accessInformation: document.getElementById('accessInformation').value,
-        },
-        section8: {
-          header: document.getElementById('sectionEightHeader').textContent,
-          signature: document.getElementById('signature').value,
-          parentName: document.getElementById('parentName').value,
-          signDate: document.getElementById('signDate').value,
+          section1: {
+            header: document.getElementById('sectionOneHeader').textContent,
+            firstName: document.getElementById('clientFirstName').value,
+            lastName: document.getElementById('clientLastName').value,
+            title: document.getElementById('title').value,
+            preferredName: document.getElementById('preferredName').value,
+            address: document.getElementById('address').value,
+            contactNumber: document.getElementById('contactNumber').value,
+            email: document.getElementById('email').value,
+            preferredContact: document.getElementById('preferredContact').value,
+            dob: document.getElementById('dob').value,
+            gender: document.getElementById('gender').value,
+            pronoun: document.getElementById('pronoun').value,
+            residency: document.getElementById('residency').value,
+            ethnicity: document.getElementById('ethnicity').value,
+            iwi: document.getElementById('iwi').value,
+            firstLanguage: document.getElementById('language').value,
+            interpreter: document.getElementById('interpreter').value,
+            culturalSupport: document.getElementById('culturalSupport').value,
+            communicationNeeds: document.getElementById('communicationNeeds').value,
+          },
+          section2: {
+            header: document.getElementById('sectionTwoHeader').textContent,
+            doctor: document.getElementById('doctor').value,
+            medicalCentre: document.getElementById('medicalCentre').value,
+            medicalContact: document.getElementById('medicalContact').value,
+            nhi: document.getElementById('nhi').value,
+          },
+          section3: {
+            header: document.getElementById('sectionThreeHeader').textContent,
+            disabilityName: document.getElementById('disabilityName').value,
+            otherMedical: document.getElementById('otherMedical').value,
+            reasonForReferral: document.getElementById('reasonForReferral').value,
+            supportNeeds: document.getElementById('supportNeeds').value,
+            urgencyOfServices: document.getElementById('urgencyOfServices').value,
+          },
+          section4: {
+            header: document.getElementById('sectionFourHeader').textContent,
+            safetyHazards: document.getElementById('safetyHazards').value,
+            otherImportantInformation: document.getElementById('otherImportantInformation').value,
+          },
+          section5: {
+            header: document.getElementById('sectionFiveHeader').textContent,
+            altFirstName: document.getElementById('altFirstName').value,
+            altLastName: document.getElementById('altLastName').value,
+            altContactNumber: document.getElementById('altContactNumber').value,
+            altEmail: document.getElementById('altEmail').value,
+            relationship: document.getElementById('relationship').value,
+          },
+          section6: {
+            header: document.getElementById('sectionSixHeader').textContent,
+            referrerFirstName: document.getElementById('referrerFirstName').value,
+            referrerLastName: document.getElementById('referrerLastName').value,
+            referrerContactNumber: document.getElementById('referrerContactNumber').value,
+            referrerEmail: document.getElementById('referrerEmail').value,
+            referrerRelationship: document.getElementById('referrerRelationship').value,
+          },
+          section7: {
+            header: document.getElementById('sectionSevenHeader').textContent,
+            consent: document.getElementById('consent').value,
+            shareInformation: document.getElementById('shareInformation').value,
+            contactConsent: document.getElementById('contactConsent').value,
+            consentStatReporting: document.getElementById('consentStatReporting').value,
+            accessInformation: document.getElementById('accessInformation').value,
+          },
+          section8: {
+            header: document.getElementById('sectionEightHeader').textContent,
+            signature: document.getElementById('signature').value,
+            parentName: document.getElementById('parentName').value,
+            signDate: document.getElementById('signDate').value,
+          }
+
         }
 
-      }
-      console.log(formData);
-    };
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
 
-    document.getElementById('submitBtn').addEventListener('click', submitForm);
+          if (!response.ok) {
+            const errorText = await response.text();
+            alert(`Upload failed: ${response.status} ${errorText}`);
+            return;
+          };
+
+          const contentDisposition = response.headers.get('Content-Disposition');
+          let filename;
+          if (
+            contentDisposition &&
+            contentDisposition.indexOf("filename=") !== -1
+          ) {
+            const matches = /filename="(.+)"/.exec(contentDisposition);
+            if (matches && matches[1]) {
+              filename = matches[1];
+            }
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+
+          pdfViewer.src = url;
+          pdfContainer.style.display = "block";
+
+          downloadBtn.href = url;
+          downloadBtn.download = filename;
+
+          alert("Form processed and ready for viewing and download!");
+        } catch (error) {
+          alert("An error occurred while uploading the form.");
+        } finally {
+          overlay.style.display = "none";
+          submitBtn.classList.remove("disabled-button");
+          submitBtn.value = "Submit Form";
+          submitBtn.setAttribute("aria-busy", "false");
+        }
+
+      });
+
 
     </script>
   </body>

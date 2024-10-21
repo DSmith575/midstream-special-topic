@@ -12,13 +12,12 @@
         pointer-events: none;
       }
 
-      .upload-form {
+      .upload-audio {
         padding: 20px;
         border-radius: 5px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 50px;
       }
 
       .upload-button {
@@ -96,17 +95,26 @@
         border-radius: 5px;
         cursor: pointer;
       }
+      
+      .audioHeader {
+        text-align: center;
+        margin-top: 50px;
+      }
+
+      .ffmpeg {
+        text-align: center;
+        margin-top: 10px;
+      }
 
     </style>
   </head>
 
   <body>
-    <header>{% include 'includes/navbar.html' %}</header>
+    <header>{% include 'includes/navbar/navbar.html' %}</header>
 
-    {% include 'includes/buttons/return-page-button.html' %}
     <section>
-    <h1>Upload Audio File</h1>
-    <p style="color: red">
+    <h1 class="audioHeader">Upload Audio File</h1>
+    <p class="ffmpeg" style="color: red">
       Ensure FFmpeg is installed. Please install it from
       <a href="https://ffmpeg.org/download.html">here</a>.
     </p>
