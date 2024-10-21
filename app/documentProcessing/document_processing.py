@@ -111,12 +111,20 @@ def save_referral_form_to_pdf(form_data, first_name, last_name, uploads_dir):
         heading_style = ParagraphStyle(
             'ColoredHeading',
             parent=styles['Heading2'],
-            textColor=colors.blue
+            textColor=colors.black
         )
         paragraph_style = styles['BodyText']
 
+        # Define a new style for bold text
+        bold_style = ParagraphStyle(
+            'BoldText',
+            parent=paragraph_style,
+            fontSize=12,
+            fontName='Helvetica-Bold'
+        )
+
         # Add title
-        story.append(Paragraph(f'{first_name} {last_name} Referral Form' , styles['Title']))
+        story.append(Paragraph(f'{first_name} {last_name} Referral Form', styles['Title']))
         story.append(Spacer(1, 12))  # Add space after title
 
         # Iterate through each section in the data object
@@ -128,7 +136,12 @@ def save_referral_form_to_pdf(form_data, first_name, last_name, uploads_dir):
             # Add the content of the section
             for field, value in section_value.items():
                 if field != 'header':  # Skip the header field
-                    story.append(Paragraph(f"{field.replace('_', ' ').title()}: {value}", paragraph_style))
+                    # Create a combined paragraph for the field name and value
+                    combined_paragraph = Paragraph(
+                        f"<b>{field.replace('_', ' ').title()}:</b> {value}",
+                        paragraph_style
+                    )
+                    story.append(combined_paragraph)  # Add the combined paragraph
             
             story.append(Spacer(1, 12))  # Space after each section
 

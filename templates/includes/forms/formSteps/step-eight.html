@@ -1,0 +1,53 @@
+<section class="step" id="step8" style="display: none">
+  <h2 id="sectionEightHeader">Section 8: Signatory</h2>
+  <label for="signature">Signature Method:</label>
+  <select id="signature">
+    <option>Digital Signature</option>
+    <option>Handwritten</option>
+  </select>
+
+  <label for="parentName"
+    >Name of Parent/Guardian (if on behalf of a child):</label
+  >
+  <input
+    type="text"
+    id="parentName"
+    value="Jane Smith"
+    placeholder="Jane Smith"
+  />
+
+  <label for="signDate">Date:</label>
+  <input
+    type="date"
+    id="signDate"
+    value="2023-10-15"
+    placeholder="2023-10-15"
+  />
+  <!-- Submit Button -->
+  <div class="buttonContainer">
+    <button type="button" class="prevBtn" onclick="prevStep(8)">
+      Previous
+    </button>
+    <button id="submitBtn" class="submitBtn">Submit Form</button>
+  </div>
+</section>
+
+<style>
+  .buttonContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+  .submitBtn {
+    background-color: #4cae4c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .submitBtn:hover {
+    background-color: #3498db;
+  }
+</style>

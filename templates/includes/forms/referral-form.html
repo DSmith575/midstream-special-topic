@@ -1,0 +1,28 @@
+<form
+  class="referralForm"
+  id="referralForm"
+  action="/upload-referral-form"
+  method="post"
+>
+  <!-- Section 1: Personal Information -->
+  {% include 'includes/forms/formSteps/step-one.html' %}
+
+  <!-- Section 2: Medical Information -->
+  {% include 'includes/forms/formSteps/step-two.html' %}
+
+  <!-- Section 3: Disability Information -->
+  {% include 'includes/forms/formSteps/step-three.html' %}
+
+  <!-- Section 4: Additional Information -->
+  {% include 'includes/forms/formSteps/step-four.html' %}
+  <!-- Section 5: Referrer Information   -->
+  {% include 'includes/forms/formSteps/step-five.html' %}
+  <!-- Section 6: Referrer's Contact Details -->
+  {% include 'includes/forms/formSteps/step-six.html' %}
+  <!-- Section 7: Consent & Privacy -->
+  {% include 'includes/forms/formSteps/step-seven.html' %}
+  <!-- Section 8: Signatory -->
+  {% include 'includes/forms/formSteps/step-eight.html' %}
+</form>
+
+<script></script>

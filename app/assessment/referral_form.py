@@ -1,7 +1,5 @@
-import os
-import sys
 import time
-from app.constants import PROCESSED_FOLDER, ALLOWED_EXTENSIONS_TEXT, ALLOWED_EXTENSIONS_AUDIO, UPLOAD_FOLDER
+from app.constants import PROCESSED_FOLDER
 from app.documentProcessing import save_referral_form_to_pdf
 
 def process_referral(ref_data):
@@ -9,9 +7,9 @@ def process_referral(ref_data):
     try:
         start_time = time.time()
         # Fix
-        first_name = ref_data.get('section1', {}).get('firstname', '')
+        first_name = ref_data.get('section1', {}).get('First Name', '')
         print(f"Processing referral form for: {first_name}")
-        last_name = ref_data.get('section1', {}).get('lastname', '')
+        last_name = ref_data.get('section1', {}).get('Last Name', '')
         pdf_path = save_referral_form_to_pdf(ref_data, first_name, last_name, PROCESSED_FOLDER)
         print(f"Processing time: {time.time() - start_time} seconds")
         return pdf_path
