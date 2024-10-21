@@ -79,27 +79,30 @@
   <body>
     <div class="container">
       <h1>Referral Form</h1>
-
+      <form class="referralForm">
       <!-- Section 1: Personal Information -->
-      <section>
-        <h2>Section 1: Personal Information</h2>
-        <label for="name">Name (First & Last):</label>
-        <input type="text" id="name" value="John Doe">
+      <section class="sectionOne">
+        <h2 id="sectionOneHeader">Section 1: Personal Information</h2>
+        <label for="clientFirstName">First Name :</label>
+        <input type="text" id="clientFirstName" value="John" placeholder="John">
+
+        <label for="clientLastName">Last Name:</label>
+        <input type="text" id="clientLastName" value="Doe" placeholder="Doe">
 
         <label for="title">Title (Mr/Mrs/Ms/etc.):</label>
-        <input type="text" id="title" value="Mr.">
+        <input type="text" id="title" value="" placeholder="Mr/Mrs/Ms/etc">
 
         <label for="preferredName">Preferred Name:</label>
-        <input type="text" id="preferredName" value="John">
+        <input type="text" id="preferredName" value="" placeholder="John">
 
         <label for="address">Address:</label>
-        <input type="text" id="address" value="123 Example Street, Sampleville, Region, 12345">
+        <input type="text" id="address" value="" placeholder="123 Example Street, Sampleville, Region, 12345">
 
         <label for="contactNumber">Contact Number:</label>
-        <input type="text" id="contactNumber" value="021 123 4567">
+        <input type="text" id="contactNumber" value="" placeholder="0211234567">
 
         <label for="email">Email:</label>
-        <input type="email" id="email" value="john.doe@example.com">
+        <input type="email" id="email" value="" placeholder="john.doe@example.com">
 
         <label for="preferredContact">Preferred Contact Method:</label>
         <select id="preferredContact">
@@ -108,25 +111,25 @@
         </select>
 
         <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="2004-08-14">
+        <input type="date" id="dob" value="" placeholder="1970-01-01">
 
         <label for="gender">Gender:</label>
-        <input type="text" id="gender" value="Male">
+        <input type="text" id="gender" value="" placeholder="Male">
 
         <label for="pronoun">Pronoun:</label>
-        <input type="text" id="pronoun" value="He">
+        <input type="text" id="pronoun" value="" placeholder="he">
 
         <label for="residency">Residency Status:</label>
-        <input type="text" id="residency" value="NZ Citizen">
+        <input type="text" id="residency" value="" placeholder="NZ Citizen">
 
         <label for="ethnicity">Ethnicity:</label>
-        <input type="text" id="ethnicity" value="NZ European">
+        <input type="text" id="ethnicity" value="" placeholder="NZ European">
 
         <label for="iwi">Iwi / Hapū (if Māori):</label>
-        <input type="text" id="iwi" value="N/A">
+        <input type="text" id="iwi" value="N/A" placeholder="N/A">
 
         <label for="language">First Language (if not English):</label>
-        <input type="text" id="language" value="N/A">
+        <input type="text" id="language" value="N/A" placeholder="N/A">
 
         <label for="interpreter">Interpreter Required:</label>
         <select id="interpreter">
@@ -145,8 +148,8 @@
       </section>
 
       <!-- Section 2: Medical Information -->
-      <section>
-        <h2>Section 2: Medical Information</h2>
+      <section class="sectionTwo">
+        <h2 id="sectionTwoHeader">Section 2: Medical Information</h2>
         <label for="doctor">Doctor/GP Name:</label>
         <input type="text" id="doctor" value="Dr. Jane Carter">
 
@@ -154,18 +157,122 @@
         <input type="text" id="medicalCentre" value="456 Health Avenue, Sampleville, Region">
 
         <label for="medicalContact">Medical Centre Contact Number:</label>
-        <input type="text" id="medicalContact" value="09 123 4567">
+        <input type="text" id="medicalContact" value="091234567" placeholder="091234567">
 
         <label for="nhi">National Health Index (NHI) Number:</label>
         <input type="text" id="nhi" value="XYZ1234">
+      </section>
+
+      <section class="sectionThree">
+        <h2 id="sectionThreeHeader">Section 3: Disability Information</h2>
+        <label for="disabilityName">Disability Name/Type:</label>
+        <input type="text" id="disabilityName" value="Autism Spectrum Disorder" placeholder="Autism Spectrum Disorder">
+
+        <label for="otherMedical">Other Medical/Health Issues (if any)</label>
+        <textarea id="otherMedical">Sleep disturbances, Sensory processing issues</textarea>
+
+        <label for="reasonForReferral">Reason for Referral:</label>
+        <textarea id="reasonForReferral">Behavioural support, Social skills development</textarea>
+
+        <label for="supportNeeds">Supports/Services Desired</label>
+        <textarea id="supportNeeds">Behavioural support, Social skills development</textarea>
+
+        <label for="urgencyOfServices">Urgency of Services/Support Needs</label>
+        <select id="urgencyOfServices">
+          <option>Urgent (required within 24 hours)</option>
+          <option>Semi-urgent (required within one week)</option>
+          <option>Non-urgent (required within one month)</option>
+        </select>
+      </section>
+
+      <section class="sectionFour">
+        <h2 id="sectionFourHeader">Section 4: Additional Information:</h2>
+
+        <label for="safetyHazards">Safety, Hazards, or Sensitive Issues</label>
+        <textarea id="safetyHazards">Tendency to wander off</textarea>
+
+        <label for="otherImportantInformation">Other Important Information</label>
+        <textarea id="otherImportantInformation">Requires a high level of support for daily living tasks</textarea>
+      </section>
+
+      <section class="sectionFive">
+        <h2 id="sectionFiveHeader">Section 5: Referrer Information</h2>
+
+        <label for="altContact">Alternative Contact:</label>
+        <input type="text" id="altFirstName" value="Jane" placeholder="Jane">
+
+        <label for="altLastName">Last Name:</label>
+        <input type="text" id="altLastName" value="Doe" placeholder="Doe">
+
+        <label for="altContactNumber">Contact Number:</label>
+        <input type="text" id="altContactNumber" value="0211234567" placeholder="0211234567">
+
+        <label for="altEmail">Email:</label>
+        <input type="email" id="altEmail" value="JaneDoe@email.com" placeholder="JaneDoe@email.com">
+
+        <label for="relationship">Relationship to Client:</label>
+        <input type="text" id="relationship" value="Parent" placeholder="Parent">
+      </section>
+
+      <section class="sectionSix">
+        <h2 id="sectionSixHeader">Section 6: Referrer's Contact Details:</h2>
+
+        <label for="referrerFirstName">Name:</label>
+        <input type="text" id="referrerFirstName" value="John" placeholder="John">
+
+        <label for="referrerLastName">Last Name:</label>
+        <input type="text" id="referrerLastName" value="Smith" placeholder="Smith">
+
+        <label for="referrerContactNumber">Contact Number:</label>
+        <input type="text" id="referrerContactNumber" value="0211234567" placeholder="0211234567">
+
+        <label for="referrerEmail">Email:</label>
+        <input type="email" id="referrerEmail" value="JohnSmith@email.com" placeholder="0211234567">
+
+        <label for="referrerRelationship">Relationship to Person Referred:</label>
+        <input type="text" id="referrerRelationship" value="Father" placeholder="Father">
+      </section>
+
+      <section class="sectionSeven">
+        <h2 id="sectionSevenHeader">Section 7: Consent & Privacy</h2>
+
+        <label for="consent">Consent to Provide Information:</label>
+        <select id="consent">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <label for="shareInformation">Consent to Share Information for assessment:</label>
+        <select id="shareInformation">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <label for="contactConsent">Consent to Be Contacted for Verification/Additional Information:</label>
+        <select id="contactConsent">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <label for="consentStatReporting">Consent for Statistical Reporting:</label>
+        <select id="consentStatReporting">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <label for="accessInformation">Right to Access/Correct Provided Information:</label>
+        <select id="accessInformation">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
       </section>
 
       <!-- Other sections (Section 3-8) -->
       <!-- Skipping additional sections for brevity -->
 
       <!-- Section 8: Signatory -->
-      <section>
-        <h2>Section 8: Signatory</h2>
+      <section class="sectionEight">
+        <h2 id="sectionEightHeader">Section 8: Signatory</h2>
         <label for="signature">Signature Method:</label>
         <select id="signature">
           <option>Digital Signature</option>
@@ -173,20 +280,103 @@
         </select>
 
         <label for="parentName">Name of Parent/Guardian (if on behalf of a child):</label>
-        <input type="text" id="parentName" value="Jane Smith">
+        <input type="text" id="parentName" value="Jane Smith" placeholder="Jane Smith">
 
         <label for="signDate">Date:</label>
-        <input type="date" id="signDate" value="2023-10-15">
+        <input type="date" id="signDate" value="2023-10-15" placeholder="2023-10-15">
       </section>
 
       <!-- Submit Button -->
       <button id="submitBtn">Submit Form</button>
+    </form>
     </div>
 
     <script>
       const goBack = () => {
         window.history.back();
       };
+
+      const submitForm = (event) => {
+      event.preventDefault();
+        const formData = {
+        section1: {
+          header: document.getElementById('sectionOneHeader').textContent,
+          firstName: document.getElementById('clientFirstName').value,
+          lastName: document.getElementById('clientLastName').value,
+          title: document.getElementById('title').value,
+          preferredName: document.getElementById('preferredName').value,
+          address: document.getElementById('address').value,
+          contactNumber: document.getElementById('contactNumber').value,
+          email: document.getElementById('email').value,
+          preferredContact: document.getElementById('preferredContact').value,
+          dob: document.getElementById('dob').value,
+          gender: document.getElementById('gender').value,
+          pronoun: document.getElementById('pronoun').value,
+          residency: document.getElementById('residency').value,
+          ethnicity: document.getElementById('ethnicity').value,
+          iwi: document.getElementById('iwi').value,
+          firstLanguage: document.getElementById('language').value,
+          interpreter: document.getElementById('interpreter').value,
+          culturalSupport: document.getElementById('culturalSupport').value,
+          communicationNeeds: document.getElementById('communicationNeeds').value,
+        },
+        section2: {
+          header: document.getElementById('sectionTwoHeader').textContent,
+          doctor: document.getElementById('doctor').value,
+          medicalCentre: document.getElementById('medicalCentre').value,
+          medicalContact: document.getElementById('medicalContact').value,
+          nhi: document.getElementById('nhi').value,
+        },
+        section3: {
+          header: document.getElementById('sectionThreeHeader').textContent,
+          disabilityName: document.getElementById('disabilityName').value,
+          otherMedical: document.getElementById('otherMedical').value,
+          reasonForReferral: document.getElementById('reasonForReferral').value,
+          supportNeeds: document.getElementById('supportNeeds').value,
+          urgencyOfServices: document.getElementById('urgencyOfServices').value,
+        },
+        section4: {
+          header: document.getElementById('sectionFourHeader').textContent,
+          safetyHazards: document.getElementById('safetyHazards').value,
+          otherImportantInformation: document.getElementById('otherImportantInformation').value,
+        },
+        section5: {
+          header: document.getElementById('sectionFiveHeader').textContent,
+          altFirstName: document.getElementById('altFirstName').value,
+          altLastName: document.getElementById('altLastName').value,
+          altContactNumber: document.getElementById('altContactNumber').value,
+          altEmail: document.getElementById('altEmail').value,
+          relationship: document.getElementById('relationship').value,
+        },
+        section6: {
+          header: document.getElementById('sectionSixHeader').textContent,
+          referrerFirstName: document.getElementById('referrerFirstName').value,
+          referrerLastName: document.getElementById('referrerLastName').value,
+          referrerContactNumber: document.getElementById('referrerContactNumber').value,
+          referrerEmail: document.getElementById('referrerEmail').value,
+          referrerRelationship: document.getElementById('referrerRelationship').value,
+        },
+        section7: {
+          header: document.getElementById('sectionSevenHeader').textContent,
+          consent: document.getElementById('consent').value,
+          shareInformation: document.getElementById('shareInformation').value,
+          contactConsent: document.getElementById('contactConsent').value,
+          consentStatReporting: document.getElementById('consentStatReporting').value,
+          accessInformation: document.getElementById('accessInformation').value,
+        },
+        section8: {
+          header: document.getElementById('sectionEightHeader').textContent,
+          signature: document.getElementById('signature').value,
+          parentName: document.getElementById('parentName').value,
+          signDate: document.getElementById('signDate').value,
+        }
+
+      }
+      console.log(formData);
+    };
+
+    document.getElementById('submitBtn').addEventListener('click', submitForm);
+
     </script>
   </body>
 
