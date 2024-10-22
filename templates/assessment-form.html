@@ -146,15 +146,15 @@
   <header>{% include 'includes/navbar/navbar.html' %}</header>
   <h1 class="assessmentHeader">Assessment Form</h1>
 
-  <form class="upload-pdf" action="/upload-pdf" id="upload-pdf" method="post" enctype="multipart/form-data">
-    <label class="audio-pdf" for="file">Upload Audio PDF:</label>
-    <input type="file" name="file" required class="upload-button" />
+<form class="upload-pdf" action="/upload-pdf" id="upload-pdf" method="post" enctype="multipart/form-data">
+  <label class="audio-pdf" for="audio-file">Upload Audio PDF:</label>
+  <input type="file" name="audio-file" id="audio-file" required class="upload-button" />
 
-    <label class="referral-pdf" for="name">Upload Referral Form PDF:</label>
-    <input type="file" name="file" required class="upload-button" />
-    
-    <input class="submit-btn" type="submit" value="Upload" aria-busy="false" />
-  </form>
+  <label class="referral-pdf" for="referral-file">Upload Referral Form PDF:</label>
+  <input type="file" name="referral-file" id="referral-file" required class="upload-button" />
+  
+  <input class="submit-btn" type="submit" value="Upload" aria-busy="false" />
+</form>
 
 
 

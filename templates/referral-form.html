@@ -73,14 +73,19 @@
 
     .pdf-container {
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
-iframe {
-  width: 100%;
-  height: 700px;
-  border: 1px solid #ccc;
-}
+  iframe {
+    width: 100%;
+    height: 700px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 1em;
+  }
 
     .download-btn {
       margin-top: 10px;
@@ -129,7 +134,7 @@ iframe {
     cursor: pointer;
   }
 
-  .prevBtn:hover, .nextBtn:hover {
+  .prevBtn:hover, .nextBtn:hover, .download-btn:hover {
     background-color: #4cae4c;
   }
   </style>
@@ -217,7 +222,7 @@ iframe {
         lastStep.style.display = 'none';
 
         const formData = {
-          section1: {
+          personalInformation: {
             header: document.getElementById('sectionOneHeader').textContent,
             "First Name": document.getElementById('clientFirstName').value,
             "Last Name": document.getElementById('clientLastName').value,
@@ -238,14 +243,14 @@ iframe {
             "Cultural Support": document.getElementById('culturalSupport').value,
             "Communication Needs": document.getElementById('communicationNeeds').value,
           },
-          section2: {
+          medicalInformation: {
             header: document.getElementById('sectionTwoHeader').textContent,
             "Doctor": document.getElementById('doctor').value,
             "Medical Center": document.getElementById('medicalCentre').value,
             "Medical Contact": document.getElementById('medicalContact').value,
             "NHI": document.getElementById('nhi').value,
           },
-          section3: {
+          disabilityInformation: {
             header: document.getElementById('sectionThreeHeader').textContent,
             "Disability Name": document.getElementById('disabilityName').value,
             "Other Medical": document.getElementById('otherMedical').value,
@@ -253,12 +258,12 @@ iframe {
             "Supports/Services Desired": document.getElementById('supportNeeds').value,
             "Urgency of Services": document.getElementById('urgencyOfServices').value,
           },
-          section4: {
+          additionalInformation: {
             header: document.getElementById('sectionFourHeader').textContent,
             "Safety Hazards, or Sensitive Issues": document.getElementById('safetyHazards').value,
             "Other Important Information": document.getElementById('otherImportantInformation').value,
           },
-          section5: {
+          referrersContact: {
             header: document.getElementById('sectionFiveHeader').textContent,
             "First Name": document.getElementById('altFirstName').value,
             "Last Name": document.getElementById('altLastName').value,
@@ -266,7 +271,7 @@ iframe {
             "Email": document.getElementById('altEmail').value,
             "Relationship to the Person Referred": document.getElementById('relationship').value,
           },
-          section6: {
+          emergencyContact: {
             header: document.getElementById('sectionSixHeader').textContent,
             "First Name": document.getElementById('referrerFirstName').value,
             "Last Name": document.getElementById('referrerLastName').value,
@@ -274,7 +279,7 @@ iframe {
             "Email": document.getElementById('referrerEmail').value,
             "Relationship to the Person Referred": document.getElementById('referrerRelationship').value,
           },
-          section7: {
+          consent: {
             header: document.getElementById('sectionSevenHeader').textContent,
             "Consent to Provide Information": document.getElementById('consent').value,
             "Consent to Share Information for Assessment": document.getElementById('shareInformation').value,
@@ -282,7 +287,7 @@ iframe {
             "Consent for Statistical Reporting": document.getElementById('consentStatReporting').value,
             "Right to Access/Correct Provided Information": document.getElementById('accessInformation').value,
           },
-          section8: {
+          signatory: {
             header: document.getElementById('sectionEightHeader').textContent,
             "Signature Method": document.getElementById('signature').value,
             "Name of Parent/Guardian (if on behalf of a child)": document.getElementById('parentName').value,
@@ -307,17 +312,16 @@ iframe {
           };
 
           const contentDisposition = response.headers.get('Content-Disposition');
-          let filename;
-          if (
-            contentDisposition &&
-            contentDisposition.indexOf("filename=") !== -1
-          ) {
-            const matches = /filename="(.+)"/.exec(contentDisposition);
-            if (matches && matches[1]) {
-              filename = matches[1];
-            }
-          }
-
+          let filename = 'default.pdf'; // Fallback filename
+if (
+    contentDisposition &&
+    contentDisposition.indexOf("filename=") !== -1
+) {
+    const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
+    if (matches && matches[1]) {
+        filename = matches[1].trim();
+    }
+}
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
 

@@ -34,6 +34,11 @@ def get_relevant_information(section, text):
               f"If there is nothing related to {section}, please indicate that there are no issues related to {section}."
               )
     
+    # prompt = (f"Based on the following transcribed audio text, does the person mentioned have any issues related to {section}? Provide a narrative of relevant information only.\n\n"
+    #       f"Text: {text} \n\n"
+    #       f"If there is nothing related to {section}, indicate that there are no issues related to {section}."
+    #      )
+    
     try:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -54,6 +59,21 @@ def analyze_completions_for_form(text):
 
     print("Analyzing PDF for form data...")
     sections = {
+        'Background, Present Living Situation, Significant Events, and Contingency Plan': [
+            'A short narrative of the person\'s background', 'Current living situation etc',
+        ],
+        # 'Communication': [
+        #     'Ability to express core needs Verbal or Non-Verbal', 'Communication aids - gestures, signs, computer, Can read,write? Yes or no. Can use a phone? Yes or no',
+        #     'Receptive / expressive skills? Yes or no'
+        # ],
+        # 'Sensory and Speech difficulties': [
+        #     'blind or nearly blind', 'deaf or nearly deaf', 'hearing impaired', 'speech impaired', 'vision impaired',
+        # ],
+        # 'Mobility': [
+        #     'driving', 'falling or history of falling', 'getting up after falling', 'moving around in the community', 'moving around inside home',
+        #     'moving around outside home', 'transfers, wheelchair to car or bed to chair', 'two or one assistance for all transfers',
+        #     'Using arms, hands, or fingers', 'Using transport as a passenger,' 'Wheelchair user',
+        # ],
         'Household Management': [
             'Faecal smearing', 'Administering personal finances', 'Garden / lawns', 
             'Home safety', 'Laundry', 'Operating home heating appliances', 
@@ -65,6 +85,9 @@ def analyze_completions_for_form(text):
             'Managing / preventing health problems', 'Managing medication', 
             'Menstrual management', 'Night Care', 'Night settling', 'Toileting'
         ],
+        # 'Continence': [
+        #     'Faecal continence', 'Urinary continence',
+        # ],
         # Add other sections accordingly
     }
 

@@ -8,7 +8,7 @@ import pymupdf
 
 
 def save_audio_transcription_to_pdf(transcription, filename, uploads_dir):
-    pdf_filename = f"{filename}.pdf"
+    pdf_filename = f"{filename}-audio-transcription.pdf"
     pdf_filepath = os.path.join(uploads_dir, pdf_filename)
     try:
         doc = SimpleDocTemplate(pdf_filepath, pagesize=A4)
@@ -28,7 +28,7 @@ def save_audio_transcription_to_pdf(transcription, filename, uploads_dir):
             transcription_text = str(transcription)  # Fallback in case it's not as expected
 
         # Add title
-        story.append(Paragraph('Audio Transcription', styles['Title']))
+        story.append(Paragraph(f'{pdf_filename} Audio Transcription', styles['Title']))
         story.append(Spacer(1, 12))  # Add space after title
 
         
@@ -99,9 +99,10 @@ def extract_text_from_pdf(filepath):
         return None
     
 
-def save_referral_form_to_pdf(form_data, first_name, last_name, uploads_dir):
-    pdf_filename = f"{first_name}-{last_name}.pdf"
-    pdf_filepath = os.path.join(uploads_dir, pdf_filename)
+def save_referral_form_to_pdf(form_data, first_name, last_name, processed_dir):
+    pdf_filename = f"{first_name}-{last_name}-referral-form.pdf"
+    print(f"Saving referral form to PDF: {pdf_filename}")
+    pdf_filepath = os.path.join(processed_dir, pdf_filename)
 
     try:
         doc = SimpleDocTemplate(pdf_filepath, pagesize=A4)

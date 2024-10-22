@@ -24,24 +24,17 @@ def process_audio(audio_path):
         full_transcription = ""
 
         # Process each chunk
-        # for i, chunk in enumerate(make_chunks(audio, CHUNK_LENGTH_MS)):
-        #     processed_chunk = process_chunks(
-        #         chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD)
-        #     processed_chunk_path = os.path.join(
-        #         PROCESSED_FOLDER, f"{filename}_chunk{i}.wav")
-        #     processed_chunk.export(processed_chunk_path, format="wav")
-        #     processed_audio_paths.append(processed_chunk_path)
+        for i, chunk in enumerate(make_chunks(audio, CHUNK_LENGTH_MS)):
+            processed_chunk = process_chunks(
+                chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD)
+            processed_chunk_path = os.path.join(
+                PROCESSED_FOLDER, f"{filename}_chunk{i}.wav")
+            processed_chunk.export(processed_chunk_path, format="wav")
+            processed_audio_paths.append(processed_chunk_path)
 
-        # for processed_path in processed_audio_paths:
-        #     transcription = process_client_audio(processed_path)
-        #     full_transcription += transcription + "\n\n"
-
-        for chunk in make_chunks(audio, CHUNK_LENGTH_MS):
-            processed_chunk = process_chunks(chunk, MIN_SILENCE_LEN, SILENCE_THRESHOLD)
-            transcription = process_client_audio(processed_chunk)
+        for processed_path in processed_audio_paths:
+            transcription = process_client_audio(processed_path)
             full_transcription += transcription + "\n\n"
-        
-            del processed_chunk
 
         gc.collect()
         
