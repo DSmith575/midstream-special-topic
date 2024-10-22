@@ -137,6 +137,11 @@
   .prevBtn:hover, .nextBtn:hover, .download-btn:hover {
     background-color: #4cae4c;
   }
+
+  .refHeader {
+    text-align: center;
+    margin-bottom: 20px;
+  }
   </style>
 </head>
 
@@ -148,7 +153,7 @@
       <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
       </div>
-      <h1>Referral Form</h1>
+      <h1 class="refHeader">Referral Form</h1>
     {% include 'includes/forms/referral-form.html' %}
 
       <div id="overlay" class="overlay" aria-hidden="true">

@@ -31,7 +31,7 @@ def process_client_audio(audio_path):
 def get_relevant_information(section, text):
     prompt = (f"Based on the following text, does the person mentioned have any issues related to {section}? do not include asking if there are any issues, just provide the information.\n\n"
               f"If yes, provide details. Text: {text} try to turn it into a usable narrative.\n\n"
-              f"If there is nothing related to {section}, please indicate that there are no issues related to {section}."
+              f"If there is nothing related to {section}, please just return No information found."
               )
     
     # prompt = (f"Based on the following transcribed audio text, does the person mentioned have any issues related to {section}? Provide a narrative of relevant information only.\n\n"
@@ -62,39 +62,42 @@ def analyze_completions_for_form(text):
         'Background, Present Living Situation, Significant Events, and Contingency Plan': [
             'A short narrative of the person\'s background', 'Current living situation etc',
         ],
-        # 'Communication': [
-        #     'Ability to express core needs Verbal or Non-Verbal', 'Communication aids - gestures, signs, computer, Can read,write? Yes or no. Can use a phone? Yes or no',
-        #     'Receptive / expressive skills? Yes or no'
-        # ],
-        # 'Sensory and Speech difficulties': [
-        #     'blind or nearly blind', 'deaf or nearly deaf', 'hearing impaired', 'speech impaired', 'vision impaired',
-        # ],
-        # 'Mobility': [
-        #     'driving', 'falling or history of falling', 'getting up after falling', 'moving around in the community', 'moving around inside home',
-        #     'moving around outside home', 'transfers, wheelchair to car or bed to chair', 'two or one assistance for all transfers',
-        #     'Using arms, hands, or fingers', 'Using transport as a passenger,' 'Wheelchair user',
-        # ],
+        'Communication': [
+            'Ability to express core needs Verbal or Non-Verbal', 'Can read/write?',
+            'Can use a phone?',
+            'Receptive / Expressive skills?'
+        ],
+        'Sensory and Speech difficulties': [
+            'Blind or nearly blind', 'Deaf or nearly deaf', 'Hearing impaired', 'Speech impaired', 'Vision impaired',
+        ],
+        'Mobility': [
+            'Driving', 'Falling or history of falling', 'Getting up after falling', 'Moving around in the community', 'Moving around inside home',
+            'Moving Around Outside home', 'Transfers, wheelchair to car or bed to chair', 'Two or one assistance for all transfers',
+            'Using arms, hands, or fingers', 'Using transport as a passenger', 'Wheelchair user',
+        ],
         'Household Management': [
             'Faecal smearing', 'Administering personal finances', 'Garden / lawns', 
             'Home safety', 'Laundry', 'Operating home heating appliances', 
             'Meal preparation', 'Shopping for necessary items', 'Other housework'
         ],
         'Self-care': [
-            'Bathing, showering, washing self', 'Bed mobility', 'Dressing and / or undressing', 
+            'Bathing, showering, Washing self', 'Bed mobility', 'Dressing and / or undressing', 
             'Eating and drinking', 'Faecal smearing', 'Grooming and caring for body parts', 
             'Managing / preventing health problems', 'Managing medication', 
             'Menstrual management', 'Night Care', 'Night settling', 'Toileting'
         ],
-        # 'Continence': [
-        #     'Faecal continence', 'Urinary continence',
-        # ],
+        'Continence': [
+            'Faecal continence', 'Urinary continence',
+        ],
         # Add other sections accordingly
     }
 
     print("Sections:", sections)  
 
     for section, items in sections.items():
-        print(f"Analyzing section: {section}")
+        if section not in form_data:
+            form_data[section] = {}
+        
         for item in items:
             print(f"Looking for item: {item}") 
             response = get_relevant_information(item, text)
@@ -103,8 +106,9 @@ def analyze_completions_for_form(text):
                 print(f"Warning: No relevant information found for {item}")
             else:
                 print(f"Found relevant information for {item}: {response}")
-            
-            form_data[item] = response
+
+            form_data[section][item] = response  # Update the item-response pair
+    print('FORM_DATA',form_data)
 
 
     return form_data
