@@ -12,21 +12,35 @@ client = OpenAI(api_key=api_key)
 def process_client_audio(audio_path):
     """Main processing function: chunk audio, process, transcribe, and convert."""
     try:
-        with open(audio_path, "rb") as audio_file:  # Automatically closes the file
-            # Transcribe audio using OpenAI's Whisper model
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file,
-                response_format="text"
-            )
+        # with open(audio_path, "rb") as audio_file:  # Automatically closes the file
+        #     # Transcribe audio using OpenAI's Whisper model
+        #     transcript = client.audio.transcriptions.create(
+        #         model="whisper-1",
+        #         file=audio_file,
+        #     )
+        print("Processing audio file:", audio_path)
+        audio_file=open(audio_path, "rb")
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file,
+            response_format="text"
+        )
+        audio_file.close()
+        # cleaned_transcript = re.sub(r'[^\w\s,.?!;:()-]', '', transcript)
+        # print("Transcript:", cleaned_transcript)
 
-        cleaned_transcript = re.sub(r'[^\w\s,.?!;:()-]', '', transcript)
-        print("Transcript:", cleaned_transcript)
+        # remove the audio file
+        try:
+            os.remove(audio_path)
+        except Exception as e:
+            print(f"Error removing audio file: {e}")
+            raise
 
         return transcript
+    
     except Exception as e:
         print(f"Failed to process audio: {e}")
-        return None
+        raise
 
 def get_relevant_information(section, text):
     prompt = (f"Based on the following text, does the person mentioned have any issues related to {section}? do not include asking if there are any issues, just provide the information.\n\n"

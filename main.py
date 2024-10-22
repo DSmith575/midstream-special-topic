@@ -5,6 +5,7 @@ from app.assessment.assessment_form import process_data
 from app.assessment.referral_form import process_referral
 from app.constants import UPLOAD_FOLDER, PROCESSED_FOLDER, ALLOWED_EXTENSIONS_AUDIO, ALLOWED_EXTENSIONS_TEXT
 from app.fileUploads.file_uploads import allowed_file, sanitize_filename, handle_exception
+from app.helperFunctions.helper_functions import delete_files_older_than
 
 app = Flask(__name__)
 
@@ -27,6 +28,8 @@ def create_folders():
 def index():
     """Render the main index page."""
     create_folders()
+    delete_files_older_than(app.config['UPLOAD_FOLDER'], 2)
+    delete_files_older_than(app.config['PROCESSED_FOLDER'], 2)
     return render_template('index.html')
 
 @app.route('/referral-form')
@@ -84,6 +87,7 @@ def upload_audio():
     
     # remove files from uploads
     try:
+        print("REMOVING FILE", filepath)
         os.remove(filepath)
     except Exception as e:
         return "Error removing file", 500
@@ -130,6 +134,8 @@ def upload_referral_form():
         )
         response.headers['Content-Disposition'] = f'attachment; filename="{filename}'
         return response
+
+    
     except Exception as e:
         return "Error sending file", 500
     
