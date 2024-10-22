@@ -8,21 +8,6 @@
   <link href="{{url_for('static',filename='css/main.css')}}" rel="stylesheet" />
 
   <style>
-    /* Your CSS styles */
-    .disabled-button {
-      background-color: grey;
-      pointer-events: none;
-    }
-
-    .form-container {
-      padding: 20px;
-      border-radius: 5px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px;
-    }
-
     .form-input {
       padding: 10px;
       width: 500px;
@@ -31,87 +16,9 @@
       border: 1px solid #3498db;
     }
 
-    .submit-btn {
-      padding: 10px;
-      margin-top: 10px;
-      width: 100px;
-      border-radius: 5px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-    }
-
-    .container {
-      position: absolute;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .spinner {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 6px solid #673ab7;
-      border-color: #673ab7 transparent #673ab7 transparent;
-      animation: rotate 1.5s linear infinite;
-    }
-
-    @keyframes rotate {
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
     .pdf-container {
       margin-top: 20px;
       text-align: center;
-    }
-
-    iframe {
-      width: 80%;
-      height: 500px;
-      border: 1px solid #ccc;
-    }
-
-    .download-btn {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .confirmation {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    button {
-      background-color: #5cb85c;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
     }
 
     .assessmentHeader {
@@ -119,7 +26,7 @@
       margin-top: 50px;
     }
 
-    .upload-pdf {
+    .upload-container {
       padding: 20px;
       border-radius: 5px;
       display: flex;
@@ -127,15 +34,13 @@
       align-items: center;
     }
 
-    .upload-button {
-      padding: 10px;
-      width: 500px;
-      border-radius: 5px;
-      border: 1px solid #3498db;
-      cursor: pointer;
-    }
 
     .referral-pdf {
+      margin-top: 20px;
+    }
+
+    .overlay-text {
+      text-align: center;
       margin-top: 20px;
     }
 
@@ -146,7 +51,7 @@
   <header>{% include 'includes/navbar/navbar.html' %}</header>
   <h1 class="assessmentHeader">Assessment Form</h1>
 
-<form class="upload-pdf" action="/upload-pdf" id="upload-pdf" method="post" enctype="multipart/form-data">
+<form class="upload-container" action="/upload-pdf" id="upload-pdf" method="post" enctype="multipart/form-data">
   <label class="audio-pdf" for="audio-file">Upload Audio PDF:</label>
   <input type="file" name="audio-file" id="audio-file" required class="upload-button" />
 
@@ -159,9 +64,11 @@
 
 
   <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="container">
-      <div class="spinner" id="spinner" role="status" aria-live="polite"></div>
+    <div class="overlay-container">
+      <div class="overlay-spinner" id="spinner" role="status" aria-live="polite"></div>
+      <div class="overlay-text">
       <p>Processing PDF...</p>
+    </div>
     </div>
   </div>
 
@@ -220,6 +127,7 @@
         const url = window.URL.createObjectURL(blob);
 
         pdfViewer.src = url;
+        form.style.display = "none";
         pdfContainer.style.display = "block";
 
         // Set the download button link and filename
