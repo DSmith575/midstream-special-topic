@@ -138,10 +138,12 @@ def save_referral_form_to_pdf(form_data, first_name, last_name, processed_dir):
                 if field != 'header':
                     # Create a combined paragraph for the field name and value
                     combined_paragraph = Paragraph(
-                        f"<b>{field.replace('_', ' ').title()}:</b> {value}",
+                        f"<b>{field.replace('_', ' ').title() if field != 'NHI' else 'NHI'}:</b> {value}",
                         paragraph_style
                     )
                     story.append(combined_paragraph)
+
+                    
             
             story.append(Spacer(1, 12))
 

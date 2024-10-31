@@ -112,13 +112,10 @@ def upload_referral_form():
         ref_data = request.get_json()
         if ref_data is None:
             return "No data received", 400
-        print("REF DATA", ref_data)
 
         processed_document = process_referral(ref_data)
-        print("PROCESSED DOC", processed_document)
 
         filename = os.path.basename(processed_document)
-        print("PROCESSED FILENAEEEEMEMEMEE", filename)
 
     except Exception as e:
         return "An error occurred during processing", 500

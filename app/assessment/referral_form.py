@@ -8,10 +8,8 @@ def process_referral(ref_data):
         start_time = time.time()
         # Fix
         first_name = ref_data.get('personalInformation', {}).get('First Name', '')
-        print(f"Processing referral form for: {first_name}")
         last_name = ref_data.get('personalInformation', {}).get('Last Name', '')
         pdf_path = save_referral_form_to_pdf(ref_data, first_name, last_name, PROCESSED_FOLDER)
-        print(f"Referral form saved to: {pdf_path}")
         print(f"Processing time: {time.time() - start_time} seconds")
         return pdf_path
     except Exception as e:
