@@ -179,10 +179,12 @@ def upload_pdf():
         return "Failed to save PDF file", 500
 
     try:
-        processed_audio_document = process_data(audio_filepath, audio_filename, app.config['PROCESSED_FOLDER'])
-
-        # processed_assessment_form = process_documents(filepath, filename, app.config['PROCESSED_FOLDER'])
-
+        processed_audio_document = process_data(audio_pdf_path=audio_filepath,
+                                                audio_filename=audio_filename,
+                                                referral_form_pdf_path=referral_filepath,
+                                                referral_form_filename=referral_filename,
+                                                process_path=app.config['PROCESSED_FOLDER'])
+        
 
     except Exception as e:
         return "An error occurred during processing", 500

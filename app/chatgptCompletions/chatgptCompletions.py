@@ -1,7 +1,8 @@
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-import re
+# import re
+from app.constants import GPT_COMPLETION_SECTIONS
 
 load_dotenv()
 
@@ -72,43 +73,8 @@ def analyze_completions_for_form(text):
     form_data = {}
 
     print("Analyzing PDF for form data...")
-    sections = {
-        'Background, Present Living Situation, Significant Events, and Contingency Plan': [
-            'A short narrative of the person\'s background', 'Current living situation etc',
-        ],
-        'Communication': [
-            'Ability to express core needs Verbal or Non-Verbal', 'Can read/write?',
-            'Can use a phone?',
-            'Receptive / Expressive skills?'
-        ],
-        'Sensory and Speech difficulties': [
-            'Blind or nearly blind', 'Deaf or nearly deaf', 'Hearing impaired', 'Speech impaired', 'Vision impaired',
-        ],
-        'Mobility': [
-            'Driving', 'Falling or history of falling', 'Getting up after falling', 'Moving around in the community', 'Moving around inside home',
-            'Moving Around Outside home', 'Transfers, wheelchair to car or bed to chair', 'Two or one assistance for all transfers',
-            'Using arms, hands, or fingers', 'Using transport as a passenger', 'Wheelchair user',
-        ],
-        'Household Management': [
-            'Faecal smearing', 'Administering personal finances', 'Garden / lawns', 
-            'Home safety', 'Laundry', 'Operating home heating appliances', 
-            'Meal preparation', 'Shopping for necessary items', 'Other housework'
-        ],
-        'Self-care': [
-            'Bathing, showering, Washing self', 'Bed mobility', 'Dressing and / or undressing', 
-            'Eating and drinking', 'Faecal smearing', 'Grooming and caring for body parts', 
-            'Managing / preventing health problems', 'Managing medication', 
-            'Menstrual management', 'Night Care', 'Night settling', 'Toileting'
-        ],
-        'Continence': [
-            'Faecal continence', 'Urinary continence',
-        ],
-        # Add other sections accordingly
-    }
 
-    print("Sections:", sections)  
-
-    for section, items in sections.items():
+    for section, items in GPT_COMPLETION_SECTIONS.items():
         if section not in form_data:
             form_data[section] = {}
         
